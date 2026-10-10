@@ -1,0 +1,75 @@
+/* ==========================================================================
+   Base element styles
+
+   This project ships no CSS framework, so the handful of normalisations we
+   actually depend on live here rather than coming from a vendor reset.
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+  /* Stop iOS inflating text when a phone is rotated to landscape. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ctc-bg);
+  color: var(--ctc-navy);
+  font-family: var(--font-mplus), sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Media should never outgrow its column. */
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+/* Form controls default to the UA font; opt them into ours. */
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--ctc-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--ctc-blue-dark);
+}
+
+
+:focus-visible {
+  outline: 3px solid var(--ctc-blue);
+  outline-offset: 2px;
+}
+
+/* Honour the OS "reduce motion" setting across every decorative animation. */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}

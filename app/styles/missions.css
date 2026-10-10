@@ -1,0 +1,166 @@
+/* ==========================================================================
+   Mission select — vertical tab list plus detail panel
+   ========================================================================== */
+
+.ctc-missions {
+  padding: 88px var(--ctc-gutter) 40px;
+}
+
+.ctc-missions-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: stretch;
+  margin-top: 32px;
+}
+
+.ctc-missions-tabs {
+  flex: 1 1 300px;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ctc-mission-tab {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 22px;
+  border: 1px solid var(--ctc-border);
+  cursor: pointer;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 20px;
+  letter-spacing: 0.02em;
+  background: #fff;
+  color: var(--ctc-navy);
+  transition:
+    transform 0.2s,
+    background 0.2s,
+    color 0.2s;
+}
+
+.ctc-mission-tab[aria-selected="true"] {
+  border-color: transparent;
+  background: var(--ctc-blue);
+  color: #fff;
+  transform: translateX(10px);
+}
+
+.ctc-mission-tab-num {
+  font-family: var(--font-mono), monospace;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ctc-muted);
+}
+
+.ctc-mission-tab-name {
+  flex: 1;
+  text-align: left;
+}
+
+.ctc-mission-tab-arrow {
+  font-size: 12px;
+  color: transparent;
+}
+
+.ctc-mission-tab[aria-selected="true"] .ctc-mission-tab-num,
+.ctc-mission-tab[aria-selected="true"] .ctc-mission-tab-arrow {
+  color: var(--ctc-yellow);
+}
+
+/* --------------------------------------------------------------------------
+   Detail panel
+   -------------------------------------------------------------------------- */
+
+.ctc-mission-panel {
+  flex: 2 1 460px;
+  min-width: 0;
+  position: relative;
+  overflow: hidden;
+  background: var(--ctc-navy);
+  color: #fff;
+  padding: clamp(28px, 4vw, 48px);
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  min-height: 380px;
+}
+
+.ctc-mission-panel-bg {
+  position: absolute;
+  right: -120px;
+  bottom: -120px;
+  width: 420px;
+  height: 420px;
+  opacity: 0.5;
+}
+
+/* Each `data-swap` child staggers in when the selected mission changes. */
+.ctc-mission-panel [data-swap] {
+  position: relative;
+  animation: ctc-swap-in 480ms var(--ctc-ease) calc(var(--swap-index) * 60ms) backwards;
+}
+
+.ctc-mission-slug {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ctc-mission-slug code {
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  color: var(--ctc-sky);
+}
+
+.ctc-mission-name {
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(40px, 5vw, 64px);
+  line-height: 0.95;
+}
+
+.ctc-mission-desc {
+  margin: 0;
+  max-width: 30em;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ctc-on-navy);
+  text-wrap: pretty;
+}
+
+.ctc-mission-expect {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.ctc-mission-expect-label {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--ctc-yellow);
+}
+
+.ctc-mission-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ctc-mission-tags span {
+  padding: 7px 14px;
+  border: 1px solid #3d5a8a;
+  background: var(--ctc-navy-deep);
+  font-family: var(--font-mono), monospace;
+  font-size: 13px;
+  color: var(--ctc-terminal-text);
+}

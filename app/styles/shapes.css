@@ -1,0 +1,47 @@
+/* ==========================================================================
+   Shapes — the angled cuts that define the CTC look.
+
+   `slant-N`  leans both vertical edges by N pixels (parallelogram).
+   `notch-N`  bevels the top-right corner by N pixels.
+   ========================================================================== */
+
+.ctc-slant-8 {
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.ctc-slant-10 {
+  clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+.ctc-slant-12 {
+  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+
+.ctc-slant-14 {
+  clip-path: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+
+.ctc-slant-16 {
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+
+.ctc-notch-12 {
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+}
+
+.ctc-notch-16 {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+}
+
+.ctc-notch-28 {
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 0 100%);
+}
+
+.ctc-notch-36 {
+  clip-path: polygon(0 0, calc(100% - 36px) 0, 100% 36px, 100% 100%, 0 100%);
+}
+
+/* Trailing-edge slant, used by the mission tabs. */
+.ctc-slant-trail-14 {
+  clip-path: polygon(0 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}

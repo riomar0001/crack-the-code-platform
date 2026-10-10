@@ -1,0 +1,233 @@
+/* ==========================================================================
+   Landing hero — headline, countdown and the operator tablet
+   ========================================================================== */
+
+.ctc-hero {
+  position: relative;
+  z-index: 2;
+  max-width: var(--ctc-max);
+  margin: 0 auto;
+  padding: 72px var(--ctc-gutter) 88px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 460px), 1fr));
+  gap: 48px;
+  align-items: center;
+}
+
+.ctc-hero-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+}
+
+.ctc-hero-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ctc-hero-title {
+  margin: 0;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.01em;
+}
+
+.ctc-hero-title span {
+  display: block;
+  font-size: clamp(56px, 8.4vw, 112px);
+  color: var(--ctc-navy);
+}
+
+.ctc-hero-title .ctc-hero-title-tag {
+  display: inline-block;
+  margin-top: 14px;
+  padding: 6px 28px 8px 22px;
+  background: var(--ctc-blue);
+  color: #fff;
+  font-size: clamp(30px, 4.2vw, 56px);
+  letter-spacing: 0.12em;
+  clip-path: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+
+.ctc-hero-lede {
+  margin: 0;
+  max-width: 30em;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ctc-ink);
+  text-wrap: pretty;
+}
+
+.ctc-hero-actions {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.ctc-hero-credits {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 22px;
+  border-top: 1px solid var(--ctc-hairline);
+}
+
+.ctc-hero-credits-row {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ctc-hero-credits-row div {
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+  max-width: 18em;
+}
+
+.ctc-hero-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 440px;
+}
+
+.ctc-hero-halo {
+  position: absolute;
+  inset: 0;
+  animation: ctc-float 6s ease-in-out infinite;
+}
+
+/* --------------------------------------------------------------------------
+   Countdown
+   -------------------------------------------------------------------------- */
+
+.ctc-countdown-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ctc-countdown-label {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--ctc-blue);
+}
+
+.ctc-countdown {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ctc-countdown-cell {
+  min-width: 84px;
+  padding: 12px 10px 10px;
+  background: #fff;
+  border: 1px solid var(--ctc-border-strong);
+  box-shadow: 0 6px 0 var(--ctc-shadow);
+  text-align: center;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+}
+
+.ctc-countdown-value {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 38px;
+  line-height: 1;
+  color: var(--ctc-navy);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Re-keyed on every change so each tick replays the flip. */
+.ctc-countdown-value--tick {
+  animation: ctc-tick 380ms cubic-bezier(0.2, 0.9, 0.3, 1.3);
+}
+
+.ctc-countdown-unit {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--ctc-muted);
+}
+
+/* --------------------------------------------------------------------------
+   Operator tablet / terminal
+   -------------------------------------------------------------------------- */
+
+.ctc-tablet {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  background: var(--ctc-navy);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 30px 60px -20px rgb(18 90 180 / 0.45);
+  border: 3px solid #fff;
+}
+
+.ctc-tablet-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 8px 12px;
+}
+
+.ctc-tablet-label {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--ctc-sky);
+}
+
+.ctc-tablet-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.ctc-tablet-dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+}
+
+.ctc-terminal {
+  background: var(--ctc-navy-deep);
+  border-radius: 10px;
+  padding: 22px 20px;
+  min-height: 300px;
+  font-family: var(--font-mono), monospace;
+  font-size: 13.5px;
+  line-height: 2;
+  color: var(--ctc-terminal-text);
+}
+
+.ctc-terminal-line {
+  white-space: pre;
+  overflow: hidden;
+  color: var(--line-color);
+  width: var(--line-width);
+  animation: ctc-type 0.9s steps(var(--line-steps)) var(--line-delay) both;
+}
+
+.ctc-terminal-caret {
+  display: inline-block;
+  width: 9px;
+  height: 17px;
+  background: var(--ctc-sky);
+  vertical-align: middle;
+  animation: ctc-blink 1s step-end infinite;
+}

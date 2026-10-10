@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Design tokens — the single source of truth for the CTC brand palette.
+   ========================================================================== */
+
+:root {
+  /* Brand blues */
+  --ctc-blue: #128afa;
+  --ctc-blue-dark: #0b5fc2;
+  --ctc-sky: #6fd3ff;
+
+  /* Navy ink */
+  --ctc-navy: #1b2a4a;
+  --ctc-navy-deep: #0e1a33;
+  --ctc-navy-line: #2c3f63;
+  --ctc-navy-dash: #33476b;
+
+  /* Text */
+  --ctc-ink: #3d5275;
+  --ctc-muted: #7a8dad;
+  --ctc-muted-dark: #5d7398;
+  --ctc-on-navy: #cfe0f5;
+  --ctc-on-blue: #e6f3ff;
+  --ctc-on-blue-soft: #cdebff;
+  --ctc-terminal-text: #cfe6ff;
+  --ctc-footer-text: #9fb3d1;
+
+  /* Accents */
+  --ctc-yellow: #ffd84d;
+  --ctc-yellow-soft: #ffe47a;
+  --ctc-pink: #fa94b4;
+  --ctc-rose: #e2607f;
+  --ctc-rose-wash: #ffe8ef;
+  --ctc-green: #9bf0b5;
+
+  /* Surfaces */
+  --ctc-bg: #f4f9ff;
+  --ctc-panel: #f7fbff;
+  --ctc-chip: #eaf4ff;
+  --ctc-border: #d6e7fa;
+  --ctc-border-soft: #e3eefa;
+  --ctc-border-strong: #cfe4fb;
+  --ctc-border-hi: #9ccbfa;
+  --ctc-shadow: #d6e9fd;
+  --ctc-hairline: #c6dff8;
+
+  /* Metrics */
+  --ctc-max: 1280px;
+  /* Page gutter tightens on narrow screens so content keeps its width. */
+  --ctc-gutter: clamp(16px, 4vw, 28px);
+
+  /* Motion */
+  --ctc-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

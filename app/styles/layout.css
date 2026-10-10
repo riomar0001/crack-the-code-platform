@@ -1,0 +1,91 @@
+/* ==========================================================================
+   Layout primitives and shared typography
+   ========================================================================== */
+
+.ctc-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+}
+
+.ctc-main {
+  flex: 1;
+}
+
+/* Centred content column with the standard page gutter. */
+.ctc-wrap {
+  max-width: var(--ctc-max);
+  margin: 0 auto;
+  padding-inline: var(--ctc-gutter);
+}
+
+/* A section that sits on the blue-to-white sky gradient. */
+.ctc-sky-section {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #bfe3ff 0%, #e3f2ff 55%, var(--ctc-bg) 100%);
+}
+
+.ctc-sky-section--short {
+  background: linear-gradient(180deg, #bfe3ff 0%, #e3f2ff 50%, var(--ctc-bg) 100%);
+}
+
+/* A plain section that still establishes a stacking context for decor. */
+.ctc-section {
+  position: relative;
+  isolation: isolate;
+  max-width: var(--ctc-max);
+  margin: 0 auto;
+}
+
+/* Small all-caps kicker above a heading. */
+.ctc-eyebrow {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.28em;
+  color: var(--ctc-blue);
+}
+
+.ctc-section-head h2 {
+  margin: 6px 0 0;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(36px, 4.5vw, 52px);
+  line-height: 1;
+}
+
+/* ==========================================================================
+   404
+   ========================================================================== */
+
+.ctc-notfound {
+  position: relative;
+  z-index: 2;
+  max-width: var(--ctc-max);
+  margin: 0 auto;
+  padding: 96px var(--ctc-gutter);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.ctc-notfound h1 {
+  margin: 0;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(48px, 7vw, 96px);
+  line-height: 0.9;
+}
+
+.ctc-notfound p {
+  margin: 0;
+  max-width: 30em;
+  font-size: 17px;
+  line-height: 1.7;
+  color: var(--ctc-ink);
+}

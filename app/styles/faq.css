@@ -1,0 +1,201 @@
+/* ==========================================================================
+   FAQ accordion
+   ========================================================================== */
+
+.ctc-faq {
+  padding: 48px var(--ctc-gutter) 96px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+}
+
+.ctc-faq-intro {
+  flex: 1 1 280px;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ctc-faq-intro h2 {
+  margin: 0;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(36px, 4.5vw, 52px);
+  line-height: 1;
+}
+
+.ctc-faq-intro p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ctc-ink);
+}
+
+.ctc-faq-intro a {
+  font-weight: 700;
+}
+
+.ctc-faq-list {
+  flex: 2 1 460px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* --------------------------------------------------------------------------
+   Card
+   -------------------------------------------------------------------------- */
+
+.ctc-faq-card {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--ctc-border);
+  transition:
+    background 0.3s,
+    border-color 0.3s,
+    transform 0.3s;
+}
+
+.ctc-faq-card[data-open="true"] {
+  background: var(--ctc-panel);
+  border-color: var(--ctc-border-hi);
+  transform: translateX(6px);
+}
+
+.ctc-faq-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--ctc-blue);
+  transform-origin: top;
+  transform: scaleY(0);
+  transition: transform 0.35s ease;
+}
+
+.ctc-faq-card[data-open="true"] .ctc-faq-bar {
+  transform: scaleY(1);
+}
+
+/* --------------------------------------------------------------------------
+   Trigger
+   -------------------------------------------------------------------------- */
+
+.ctc-faq-trigger {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 24px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-mplus), sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  color: var(--ctc-navy);
+  transition: color 0.2s;
+}
+
+.ctc-faq-trigger:hover {
+  color: var(--ctc-blue);
+}
+
+.ctc-faq-num {
+  font-family: var(--font-mono), monospace;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--ctc-blue);
+}
+
+.ctc-faq-q {
+  flex: 1;
+}
+
+/* Plus sign that rotates into a cross when open. */
+.ctc-faq-icon {
+  position: relative;
+  flex-shrink: 0;
+  display: block;
+  color: var(--ctc-blue);
+  background: var(--ctc-chip);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition:
+    transform 0.35s cubic-bezier(0.3, 1.6, 0.5, 1),
+    background 0.25s,
+    color 0.25s;
+}
+
+.ctc-faq-card[data-open="true"] .ctc-faq-icon {
+  color: #fff;
+  background: var(--ctc-blue);
+  transform: rotate(135deg);
+}
+
+.ctc-faq-icon i {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+.ctc-faq-icon i:first-child {
+  width: 12px;
+  height: 2px;
+  margin: -1px 0 0 -6px;
+}
+
+.ctc-faq-icon i:last-child {
+  width: 2px;
+  height: 12px;
+  margin: -6px 0 0 -1px;
+}
+
+/* --------------------------------------------------------------------------
+   Answer panel — 0fr → 1fr grid row animates height without a fixed value.
+   -------------------------------------------------------------------------- */
+
+.ctc-faq-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.4s var(--ctc-ease);
+}
+
+.ctc-faq-card[data-open="true"] .ctc-faq-panel {
+  grid-template-rows: 1fr;
+}
+
+.ctc-faq-panel > div {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.ctc-faq-panel p {
+  margin: 0;
+  padding: 0 24px 22px 62px;
+  font-size: 15px;
+  line-height: 1.75;
+  color: var(--ctc-ink);
+  text-wrap: pretty;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition:
+    opacity 0.15s,
+    transform 0.15s;
+}
+
+.ctc-faq-card[data-open="true"] .ctc-faq-panel p {
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity 0.35s 0.12s,
+    transform 0.35s 0.12s;
+}

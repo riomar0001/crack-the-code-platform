@@ -1,0 +1,418 @@
+/* ==========================================================================
+   Responsive overrides
+
+   The base layout is fluid — auto-fit grids, flex-wrap, clamp() type — so
+   most of the page reflows on its own. This file holds the places where
+   fluidity alone is not enough: fixed pixel minimums that overflow narrow
+   screens, decoration sized for desktop, and the header nav.
+
+   Breakpoints: 1024 / 768 / 560 / 400.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   Universal guards
+   -------------------------------------------------------------------------- */
+
+/* Nothing should ever force the page sideways.
+   `clip` rather than `hidden` on purpose: `hidden` turns the element into a
+   scroll container, which would break the sticky header. `.ctc-shell` already
+   clips too; this is the backstop for anything rendered outside it. */
+html {
+  overflow-x: clip;
+}
+
+/* Long team names, aliases and emails are user input — never let them
+   push a container wider than the viewport. */
+.ctc-done-title,
+.ctc-squad-name,
+.ctc-mission-name,
+.ctc-hero-title span {
+  overflow-wrap: anywhere;
+}
+
+/* The terminal prints fixed `ch` widths, so it needs its own escape hatch. */
+.ctc-terminal {
+  overflow-x: auto;
+  font-size: clamp(9.5px, 2.5vw, 13.5px);
+}
+
+/* --------------------------------------------------------------------------
+   <= 1024px — tablet
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 1024px) {
+  .ctc-missions {
+    padding-top: 64px;
+  }
+
+  .ctc-hero {
+    padding: 56px var(--ctc-gutter) 64px;
+    gap: 36px;
+  }
+
+  /* The hero halo is 560px wide; shrink it with the column. */
+  .ctc-hero-visual {
+    min-height: 0;
+  }
+
+  .ctc-missions-tabs {
+    max-width: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   <= 768px — large phone / small tablet
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+  .ctc-hero {
+    padding: 40px var(--ctc-gutter) 56px;
+  }
+
+  /* Decorative rings start costing more than they add. */
+  .ctc-hero-halo,
+  .ctc-mission-panel-bg {
+    display: none;
+  }
+
+  /* Countdown: four fixed 84px cells plus gaps overflow a phone. Let them
+     share the row evenly instead of wrapping into a ragged 2x2. */
+  .ctc-countdown {
+    gap: 8px;
+  }
+
+  .ctc-countdown-cell {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 10px 4px 8px;
+  }
+
+  .ctc-countdown-value {
+    font-size: clamp(24px, 7vw, 38px);
+  }
+
+  .ctc-countdown-unit {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  /* Buttons go full width so they are comfortable thumb targets. */
+  .ctc-hero-actions,
+  .ctc-done-actions,
+  .ctc-notfound > div {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ctc-hero-actions .ctc-btn,
+  .ctc-done-actions .ctc-btn,
+  .ctc-notfound .ctc-btn {
+    width: 100%;
+  }
+
+  /* Stacking six full-width tabs above the panel makes this section roughly
+     870px tall on a phone. Turn the list into a horizontal scroll strip so
+     the detail panel stays near the top of the fold. */
+  .ctc-missions-grid {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ctc-missions-tabs {
+    flex: 1 1 auto;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    /* Bleed to the screen edges so the strip reads as scrollable. */
+    margin-inline: calc(var(--ctc-gutter) * -1);
+    padding-inline: var(--ctc-gutter);
+  }
+
+  .ctc-missions-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ctc-mission-tab {
+    flex: 0 0 auto;
+    width: auto;
+    scroll-snap-align: start;
+    white-space: nowrap;
+    font-size: 16px;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  /* The sideways nudge and the trailing arrow both cost width here. */
+  .ctc-mission-tab[aria-selected="true"] {
+    transform: none;
+  }
+
+  .ctc-mission-tab-arrow {
+    display: none;
+  }
+
+  .ctc-mission-tab-name {
+    flex: 0 0 auto;
+  }
+
+  .ctc-mission-panel {
+    min-height: 0;
+    gap: 18px;
+  }
+
+  .ctc-mission-name {
+    font-size: clamp(30px, 8vw, 40px);
+  }
+
+  .ctc-mission-desc {
+    font-size: 16px;
+  }
+
+  .ctc-faq {
+    padding-bottom: 64px;
+    gap: 28px;
+  }
+
+  .ctc-faq-intro {
+    max-width: none;
+  }
+
+  .ctc-faq-trigger {
+    padding: 16px 18px;
+    font-size: 16px;
+    gap: 12px;
+  }
+
+  .ctc-faq-panel p {
+    padding: 0 18px 18px 46px;
+  }
+
+  /* Clause numbers get their own line rather than a 48px gutter. */
+  .ctc-clause {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding: 22px 0;
+  }
+
+  .ctc-clause-num {
+    padding-top: 0;
+  }
+
+  .ctc-footer-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .ctc-footer-links {
+    gap: 14px 18px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   <= 560px — phone
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 560px) {
+  /* Header: the brand keeps its row, the nav scrolls horizontally rather
+     than wrapping into three ragged lines. */
+  .ctc-header-inner {
+    gap: 12px;
+    padding: 10px var(--ctc-gutter);
+  }
+
+  .ctc-nav {
+    order: 3;
+    flex: 1 0 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin-inline: calc(var(--ctc-gutter) * -1);
+    padding-inline: var(--ctc-gutter);
+  }
+
+  .ctc-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ctc-nav a {
+    white-space: nowrap;
+    padding: 6px 10px;
+  }
+
+  .ctc-header-actions {
+    margin-left: auto;
+  }
+
+  .ctc-btn--sm {
+    padding: 8px 18px;
+    font-size: 14px;
+  }
+
+  .ctc-brand-name {
+    font-size: 17px;
+  }
+
+  .ctc-brand-sub {
+    font-size: 9px;
+    letter-spacing: 0.3em;
+  }
+
+  /* Angled corners are proportionally huge on a small card. */
+  .ctc-form-card,
+  .ctc-done {
+    clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 0 100%);
+  }
+
+  /* min-height and gap are already relaxed at the 768px breakpoint. */
+  .ctc-mission-panel {
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%);
+  }
+
+  .ctc-form-card {
+    padding: 24px 16px;
+    gap: 20px;
+  }
+
+  .ctc-done {
+    padding: 32px 20px;
+  }
+
+  /* Member rows become three explicit grid rows:
+       1. the member badge, with the remove button opposite it
+       2. the inputs, stacked full width
+       3. any validation messages
+     Without the explicit placement below, the remove button auto-flows after
+     the full-width input stack and strands itself at the bottom-left. */
+  .ctc-member,
+  .ctc-member--removable {
+    grid-template-columns: auto minmax(0, 1fr);
+    row-gap: 12px;
+  }
+
+  .ctc-member-remove {
+    grid-row: 1;
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .ctc-member-inputs {
+    grid-row: 2;
+    grid-column: 1 / -1;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .ctc-member-inputs > .ctc-input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .ctc-member-errors {
+    grid-row: 3;
+  }
+
+  .ctc-register {
+    padding: 36px var(--ctc-gutter) 64px;
+  }
+
+  .ctc-doc-hero {
+    padding: 36px var(--ctc-gutter) 28px;
+  }
+
+  .ctc-doc-body {
+    padding-bottom: 64px;
+  }
+
+  .ctc-doc-tab {
+    padding: 8px 14px;
+    font-size: 13px;
+  }
+
+  .ctc-tablet {
+    padding: 10px;
+  }
+
+  .ctc-terminal {
+    padding: 16px 14px;
+    min-height: 0;
+  }
+
+  .ctc-squad-crest {
+    height: 100px;
+  }
+
+  .ctc-footer-legal {
+    gap: 8px;
+  }
+
+  .ctc-ticker-row {
+    font-size: 14px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   <= 400px — small phone
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 400px) {
+  .ctc-hero-title span {
+    font-size: clamp(42px, 13vw, 56px);
+  }
+
+  .ctc-hero-title .ctc-hero-title-tag {
+    font-size: clamp(24px, 7.5vw, 30px);
+    padding: 5px 18px 6px 14px;
+  }
+
+  .ctc-hero-chips {
+    gap: 6px;
+  }
+
+  .ctc-chip {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    padding: 5px 10px;
+  }
+
+  .ctc-countdown-cell {
+    padding: 8px 2px 6px;
+  }
+
+  .ctc-btn--lg {
+    padding: 14px 24px;
+    font-size: 18px;
+  }
+
+  .ctc-done-code {
+    font-size: 19px;
+    padding: 10px 14px;
+    letter-spacing: 0.08em;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Coarse pointers — make tap targets comfortable regardless of width
+   -------------------------------------------------------------------------- */
+
+@media (pointer: coarse) {
+  .ctc-nav a,
+  .ctc-footer-links a {
+    padding-block: 10px;
+  }
+
+  .ctc-member-remove {
+    width: 44px;
+    height: 44px;
+  }
+
+  .ctc-agree input {
+    width: 22px;
+    height: 22px;
+  }
+}

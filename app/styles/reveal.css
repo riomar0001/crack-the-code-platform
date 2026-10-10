@@ -1,0 +1,90 @@
+/* ==========================================================================
+   Reveal-on-scroll
+
+   `<Reveal>` renders `data-reveal="<direction>"` plus
+   `data-revealed="false"`, and flips the latter to "true" once the element
+   intersects the viewport. Elements that never get observed (no JS, no
+   IntersectionObserver) are left without `data-revealed` and so stay visible.
+   ========================================================================== */
+
+[data-reveal] {
+  transition:
+    opacity 0.75s var(--ctc-ease),
+    transform 0.75s var(--ctc-ease),
+    filter 0.75s var(--ctc-ease);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+
+[data-reveal][data-revealed="false"] {
+  opacity: 0;
+  filter: blur(4px);
+}
+
+[data-reveal="up"][data-revealed="false"] {
+  transform: translateY(32px);
+}
+
+[data-reveal="left"][data-revealed="false"] {
+  transform: translateX(-36px);
+}
+
+[data-reveal="right"][data-revealed="false"] {
+  transform: translateX(36px);
+}
+
+[data-reveal="scale"][data-revealed="false"] {
+  transform: scale(0.94) translateY(16px);
+}
+
+[data-reveal][data-revealed="true"] {
+  opacity: 1;
+  transform: none;
+  filter: none;
+}
+
+/* ==========================================================================
+   Intro curtain
+   ========================================================================== */
+
+.ctc-intro {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: var(--ctc-blue);
+  pointer-events: none;
+  animation: ctc-intro-wipe 650ms cubic-bezier(0.75, 0, 0.25, 1) 970ms forwards;
+}
+
+/* The global reduced-motion rule shortens durations but not delays, which
+   would leave the curtain sitting there. Skip it outright instead. */
+@media (prefers-reduced-motion: reduce) {
+  .ctc-intro {
+    display: none;
+  }
+}
+
+.ctc-intro-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 50%;
+  animation: ctc-intro-art 520ms cubic-bezier(0.6, 0, 0.4, 1) 650ms forwards;
+}
+
+.ctc-intro-ring {
+  transform-box: view-box;
+  transform-origin: 600px 400px;
+}
+
+.ctc-intro-ring--outer {
+  animation: ctc-spin 6s linear infinite;
+}
+
+.ctc-intro-ring--inner {
+  animation: ctc-spin 4s linear infinite reverse;
+}
+
+.ctc-intro-ring--dot {
+  animation: ctc-spin 2s linear infinite;
+}

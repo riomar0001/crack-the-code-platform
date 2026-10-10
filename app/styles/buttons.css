@@ -1,0 +1,89 @@
+/* ==========================================================================
+   Buttons — `.ctc-btn` plus a variant for colour and a variant for size.
+   Combine with a shape class from shapes.css for the angled edges.
+   ========================================================================== */
+
+.ctc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 0;
+  cursor: pointer;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    transform 0.15s;
+}
+
+.ctc-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Colour variants */
+
+.ctc-btn--primary {
+  background: var(--ctc-yellow);
+  color: var(--ctc-navy);
+}
+
+.ctc-btn--primary:hover:not(:disabled) {
+  background: var(--ctc-yellow-soft);
+  color: var(--ctc-navy);
+  transform: translateY(-2px);
+}
+
+.ctc-btn--ghost {
+  background: #fff;
+  color: var(--ctc-blue);
+}
+
+.ctc-btn--ghost:hover:not(:disabled) {
+  color: var(--ctc-blue-dark);
+  transform: translateY(-2px);
+}
+
+/* Size variants */
+
+.ctc-btn--sm {
+  padding: 10px 26px;
+  font-size: 15px;
+}
+
+.ctc-btn--md {
+  padding: 14px 32px;
+  font-size: 18px;
+}
+
+.ctc-btn--lg {
+  padding: 16px 38px;
+  font-size: 20px;
+}
+
+/* The small "+ ADD MEMBER" style action. */
+.ctc-btn-quiet {
+  padding: 7px 16px;
+  border: 0;
+  cursor: pointer;
+  background: var(--ctc-chip);
+  color: var(--ctc-blue);
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  transition: background 0.2s;
+}
+
+.ctc-btn-quiet:hover:not(:disabled) {
+  background: var(--ctc-shadow);
+}
+
+.ctc-btn-quiet:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

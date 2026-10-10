@@ -1,0 +1,57 @@
+/* ==========================================================================
+   Chips and hex badges
+   ========================================================================== */
+
+.ctc-chip {
+  padding: 5px 14px;
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+}
+
+.ctc-chip--solid {
+  background: var(--ctc-blue);
+  color: #fff;
+}
+
+.ctc-chip--light {
+  background: #fff;
+  color: var(--ctc-blue);
+}
+
+/* Hexagonal member/rank badge. Size and colours come from inline custom
+   properties so one class covers every usage. */
+.ctc-hex {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--hex-size);
+  height: var(--hex-size);
+  font-size: calc(var(--hex-size) * 0.4);
+  background: var(--hex-bg);
+  color: var(--hex-fg, var(--ctc-navy));
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+}
+
+/* Pulsing "live" dot. */
+.ctc-live-dot {
+  position: relative;
+  width: 8px;
+  height: 8px;
+}
+
+.ctc-live-dot i {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--ctc-green);
+}
+
+.ctc-live-dot i:last-child {
+  animation: ctc-pulse 1.6s ease-out infinite;
+}

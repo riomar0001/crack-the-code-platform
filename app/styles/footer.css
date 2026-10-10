@@ -1,0 +1,111 @@
+/* ==========================================================================
+   Site footer
+   ========================================================================== */
+
+.ctc-footer {
+  background: var(--ctc-navy);
+  color: var(--ctc-footer-text);
+}
+
+.ctc-footer-top {
+  max-width: var(--ctc-max);
+  margin: 0 auto;
+  padding: 36px var(--ctc-gutter);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.ctc-footer-brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.ctc-footer-brand-name {
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 18px;
+  color: #fff;
+}
+
+.ctc-footer-brand-sub {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 600;
+  font-size: 10px;
+  letter-spacing: 0.42em;
+  color: var(--ctc-sky);
+  margin-top: 4px;
+}
+
+.ctc-footer-links {
+  display: flex;
+  gap: 22px;
+  flex-wrap: wrap;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ctc-footer-links a {
+  color: var(--ctc-footer-text);
+}
+
+.ctc-footer-links a:hover {
+  color: #fff;
+}
+
+.ctc-footer-bottom {
+  border-top: 1px solid var(--ctc-navy-line);
+}
+
+.ctc-footer-bottom-inner {
+  max-width: var(--ctc-max);
+  margin: 0 auto;
+  padding: 28px var(--ctc-gutter) 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ctc-footer-eyebrow {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--ctc-sky);
+}
+
+.ctc-footer-orgs {
+  display: flex;
+  gap: 28px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ctc-footer-orgs div {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+  max-width: 19em;
+}
+
+.ctc-footer-legal {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--ctc-muted);
+}
+
+.ctc-footer-legal b {
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  color: var(--ctc-sky);
+}
