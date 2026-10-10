@@ -23,11 +23,6 @@ export const site = {
    */
   eventStart: process.env.NEXT_PUBLIC_EVENT_START ?? "2026-10-30T09:00:00+08:00",
 
-  organizers: [
-    "University of Mindanao | College of Computing Education",
-    "University of Mindanao | College of Computing Education: Skills Clinic",
-  ],
-
   /** Email domain every participant must register under. */
   emailDomain: "umindanao.edu.ph",
   emailPlaceholder: "you@umindanao.edu.ph",
@@ -38,6 +33,63 @@ export const site = {
   minTeamNameLength: 3,
   maxTeamNameLength: 32,
 } as const;
+
+/**
+ * Human-readable event date, derived from `eventStart` so the two cannot
+ * drift apart. Pinned to the venue's timezone so server and client agree.
+ */
+const eventDate = new Date(site.eventStart);
+
+export const eventDateLabel = Number.isNaN(eventDate.getTime())
+  ? ""
+  : new Intl.DateTimeFormat("en-US", {
+      dateStyle: "long",
+      timeZone: "Asia/Manila",
+    }).format(eventDate);
+
+export type Credit = {
+  name: string;
+  /** Path under /public. Omit for a text-only credit. */
+  logo?: string;
+};
+
+export type CreditGroup = {
+  label: string;
+  entries: readonly Credit[];
+};
+
+/**
+ * Who stands behind the event, grouped by how they take part. Order matters:
+ * the first group is the organizers (also used by the footer).
+ */
+export const credits: readonly CreditGroup[] = [
+  {
+    label: "ORGANIZED BY",
+    entries: [
+      {
+        name: "University of Mindanao College of Computing Education",
+        logo: "/credits/um-cce.webp",
+      },
+      { name: "UM CCE Olympus Protocol" },
+    ],
+  },
+  {
+    label: "IN PARTNERSHIP WITH",
+    entries: [{ name: "DEVCON Davao", logo: "/credits/devcon-davao.webp" }],
+  },
+  {
+    label: "SUPPORTED BY",
+    entries: [
+      { name: "University of Mindanao CCE-CSG", logo: "/credits/um-cce-csg.webp" },
+      {
+        name: "University of Mindanao CCE Skills Clinic",
+        logo: "/credits/um-cce-skills-clinic.webp",
+      },
+    ],
+  },
+];
+
+export const organizers = credits[0].entries.map((entry) => entry.name);
 
 export const mainNav = [
   { href: "/", label: "Home" },

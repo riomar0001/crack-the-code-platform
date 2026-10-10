@@ -1,0 +1,83 @@
+/* ==========================================================================
+   Credits — organizers, partners and supporters with their logos.
+   Shared by the hero (light) and the footer (dark).
+   ========================================================================== */
+
+.ctc-credits {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ctc-credit-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ctc-credit-label {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--ctc-blue);
+}
+
+.ctc-credit-row {
+  display: flex;
+  gap: 12px 26px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.ctc-credit {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 19em;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+/* Logos are squared to one box so seals, badges and marks line up. */
+.ctc-credit-logo {
+  flex-shrink: 0;
+  display: block;
+  width: 44px;
+  height: 44px;
+}
+
+.ctc-credit-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Dark tone: several logos are dark-on-transparent (DEVCON's wordmark, the
+   CSG badge), so every logo sits on a white tile to stay legible. */
+.ctc-credits--dark .ctc-credit-label {
+  font-size: 11px;
+  color: var(--ctc-sky);
+}
+
+.ctc-credits--dark .ctc-credit {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.ctc-credits--dark .ctc-credit-logo {
+  padding: 4px;
+  border-radius: 10px;
+  background: #fff;
+}
+
+/* Footer: groups run side by side where there is room, so the footer does
+   not grow into a tall list. */
+.ctc-credits--dark {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 24px 48px;
+}

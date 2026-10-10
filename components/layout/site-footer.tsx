@@ -1,7 +1,8 @@
 import Link from "next/link";
 
+import { CreditGroups } from "@/components/layout/credit-groups";
 import { Reveal } from "@/components/ui/reveal";
-import { footerNav, site } from "@/lib/site";
+import { footerNav, organizers, site } from "@/lib/site";
 
 export function SiteFooter() {
   return (
@@ -23,17 +24,13 @@ export function SiteFooter() {
 
       <div className="ctc-footer-bottom">
         <div className="ctc-footer-bottom-inner">
-          <div className="ctc-footer-eyebrow">ORGANIZED BY</div>
-
-          <Reveal className="ctc-footer-orgs">
-            {site.organizers.map((organizer) => (
-              <div key={organizer}>{organizer}</div>
-            ))}
+          <Reveal>
+            <CreditGroups tone="dark" />
           </Reveal>
 
           <div className="ctc-footer-legal">
             <div>
-              © {site.copyrightYear} {site.fullName} · {site.organizers[0]}
+              © {site.copyrightYear} {site.fullName} · {organizers[0]}
             </div>
             <div>
               by <b>{site.byline}</b>

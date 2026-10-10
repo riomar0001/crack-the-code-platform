@@ -36,6 +36,81 @@ html {
   font-size: clamp(9.5px, 2.5vw, 13.5px);
 }
 
+/* Sticky header covers the top of the viewport; keep in-page anchors
+   (`/#missions`, `/#faq`) from landing underneath it. */
+html {
+  scroll-padding-top: 80px;
+}
+
+/* --------------------------------------------------------------------------
+   <= 960px — the nav no longer fits beside the wordmark and the button, so it
+   collapses into a menu. Wrapping it instead gives a tall, ragged header that
+   eats the top of every page.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 960px) {
+  .ctc-header-inner {
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .ctc-header-actions {
+    margin-left: auto;
+  }
+
+  .ctc-nav-toggle {
+    display: block;
+  }
+
+  /* The dropdown hangs off the sticky header. `visibility` (not display) is
+     what hides it, so it can fade and still drop out of the tab order. */
+  .ctc-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    z-index: 2;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 2px;
+    padding: 10px var(--ctc-gutter) 16px;
+    background: #fff;
+    border-bottom: 1px solid var(--ctc-border);
+    box-shadow: 0 16px 32px -20px rgb(27 42 74 / 0.35);
+    max-height: calc(100dvh - 100%);
+    overflow-y: auto;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-8px);
+    pointer-events: none;
+    transition:
+      opacity 0.2s,
+      transform 0.25s var(--ctc-ease),
+      visibility 0s linear 0.25s;
+  }
+
+  .ctc-nav[data-open="true"] {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+    transition-delay: 0s;
+  }
+
+  .ctc-nav a:not(.ctc-btn) {
+    padding: 14px 12px;
+    font-size: 16px;
+  }
+
+  .ctc-nav-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: rgb(14 26 51 / 0.25);
+  }
+}
+
 /* --------------------------------------------------------------------------
    <= 1024px — tablet
    -------------------------------------------------------------------------- */
@@ -57,6 +132,76 @@ html {
 
   .ctc-missions-tabs {
     max-width: none;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   <= 900px — mission select stacks
+   The side-by-side layout needs ~840px to hold a 300px tab list and a 460px
+   panel; below that the flex row wraps. Switch to a stacked layout on purpose
+   rather than letting it wrap by accident.
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 900px) {
+  /* Stacking six full-width tabs above the panel makes this section roughly
+     870px tall on a phone. Turn the list into a horizontal scroll strip so
+     the detail panel stays near the top of the fold.
+
+     `nowrap` matters: in a wrapping column the flex line is as wide as its
+     widest item, so the (nowrap) tab strip would drag the whole grid out to
+     ~1000px and the panel with it. */
+  .ctc-missions-grid {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 16px;
+  }
+
+  /* In a column, `flex-basis` is a height — the desktop 460px basis would
+     force the panel to be at least that tall. */
+  .ctc-mission-panel {
+    flex: 0 0 auto;
+  }
+
+  .ctc-missions-tabs {
+    flex: 0 0 auto;
+    min-width: 0;
+    padding-block: 4px;
+    flex-direction: row;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    /* Bleed to the screen edges so the strip reads as scrollable. */
+    margin-inline: calc(var(--ctc-gutter) * -1);
+    padding-inline: var(--ctc-gutter);
+  }
+
+  .ctc-missions-tabs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ctc-mission-tab {
+    flex: 0 0 auto;
+    width: auto;
+    scroll-snap-align: start;
+    white-space: nowrap;
+    font-size: 16px;
+    padding: 12px 16px;
+    gap: 10px;
+  }
+
+  /* The sideways nudge and the trailing arrow both cost width here. */
+  .ctc-mission-tab[aria-selected="true"] {
+    transform: none;
+  }
+
+  .ctc-mission-tab-arrow {
+    display: none;
+  }
+
+  .ctc-mission-tab-name {
+    flex: 0 0 auto;
   }
 }
 
@@ -108,54 +253,6 @@ html {
   .ctc-done-actions .ctc-btn,
   .ctc-notfound .ctc-btn {
     width: 100%;
-  }
-
-  /* Stacking six full-width tabs above the panel makes this section roughly
-     870px tall on a phone. Turn the list into a horizontal scroll strip so
-     the detail panel stays near the top of the fold. */
-  .ctc-missions-grid {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .ctc-missions-tabs {
-    flex: 1 1 auto;
-    flex-direction: row;
-    gap: 8px;
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    /* Bleed to the screen edges so the strip reads as scrollable. */
-    margin-inline: calc(var(--ctc-gutter) * -1);
-    padding-inline: var(--ctc-gutter);
-  }
-
-  .ctc-missions-tabs::-webkit-scrollbar {
-    display: none;
-  }
-
-  .ctc-mission-tab {
-    flex: 0 0 auto;
-    width: auto;
-    scroll-snap-align: start;
-    white-space: nowrap;
-    font-size: 16px;
-    padding: 12px 16px;
-    gap: 10px;
-  }
-
-  /* The sideways nudge and the trailing arrow both cost width here. */
-  .ctc-mission-tab[aria-selected="true"] {
-    transform: none;
-  }
-
-  .ctc-mission-tab-arrow {
-    display: none;
-  }
-
-  .ctc-mission-tab-name {
-    flex: 0 0 auto;
   }
 
   .ctc-mission-panel {
@@ -217,37 +314,6 @@ html {
    -------------------------------------------------------------------------- */
 
 @media (max-width: 560px) {
-  /* Header: the brand keeps its row, the nav scrolls horizontally rather
-     than wrapping into three ragged lines. */
-  .ctc-header-inner {
-    gap: 12px;
-    padding: 10px var(--ctc-gutter);
-  }
-
-  .ctc-nav {
-    order: 3;
-    flex: 1 0 100%;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    margin-inline: calc(var(--ctc-gutter) * -1);
-    padding-inline: var(--ctc-gutter);
-  }
-
-  .ctc-nav::-webkit-scrollbar {
-    display: none;
-  }
-
-  .ctc-nav a {
-    white-space: nowrap;
-    padding: 6px 10px;
-  }
-
-  .ctc-header-actions {
-    margin-left: auto;
-  }
-
   .ctc-btn--sm {
     padding: 8px 18px;
     font-size: 14px;
@@ -353,6 +419,30 @@ html {
 
   .ctc-ticker-row {
     font-size: 14px;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   <= 440px — the header button moves into the menu to free up the row
+   -------------------------------------------------------------------------- */
+
+@media (max-width: 440px) {
+  .ctc-header-actions .ctc-btn {
+    display: none;
+  }
+
+  .ctc-nav a.ctc-nav-cta {
+    display: flex;
+    margin-top: 8px;
+    padding: 14px 24px;
+    font-size: 16px;
+    border-radius: 0;
+    color: var(--ctc-navy);
+  }
+
+  .ctc-nav a.ctc-nav-cta:hover {
+    background: var(--ctc-yellow-soft);
+    color: var(--ctc-navy);
   }
 }
 

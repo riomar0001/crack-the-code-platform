@@ -110,3 +110,79 @@
   gap: 10px;
   align-items: center;
 }
+
+/* --------------------------------------------------------------------------
+   Mobile menu pieces — hidden on desktop, switched on in responsive.css.
+   -------------------------------------------------------------------------- */
+
+.ctc-nav-toggle,
+.ctc-nav-cta,
+.ctc-nav-scrim {
+  display: none;
+}
+
+.ctc-nav-toggle {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--ctc-border);
+  border-radius: 6px;
+  background: #fff;
+  color: var(--ctc-navy);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ctc-nav-toggle:hover {
+  background: var(--ctc-chip);
+}
+
+/* Three bars drawn from one element: the span is the middle bar, its
+   pseudo-elements are the outer two, and all three fold into an X. */
+.ctc-nav-toggle-bars,
+.ctc-nav-toggle-bars::before,
+.ctc-nav-toggle-bars::after {
+  position: absolute;
+  left: 50%;
+  width: 20px;
+  height: 2px;
+  margin-left: -10px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 0.25s var(--ctc-ease),
+    background 0.2s;
+}
+
+.ctc-nav-toggle-bars {
+  top: 50%;
+  margin-top: -1px;
+}
+
+.ctc-nav-toggle-bars::before,
+.ctc-nav-toggle-bars::after {
+  content: "";
+  left: 0;
+  margin-left: 0;
+}
+
+.ctc-nav-toggle-bars::before {
+  top: -7px;
+}
+
+.ctc-nav-toggle-bars::after {
+  top: 7px;
+}
+
+.ctc-nav-toggle[aria-expanded="true"] .ctc-nav-toggle-bars {
+  background: transparent;
+}
+
+.ctc-nav-toggle[aria-expanded="true"] .ctc-nav-toggle-bars::before {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.ctc-nav-toggle[aria-expanded="true"] .ctc-nav-toggle-bars::after {
+  transform: translateY(-7px) rotate(-45deg);
+}

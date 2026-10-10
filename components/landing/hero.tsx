@@ -3,9 +3,10 @@ import Link from "next/link";
 import { SkyLayer } from "@/components/decor/sky-layer";
 import { Countdown } from "@/components/landing/countdown";
 import { OperatorTablet } from "@/components/landing/operator-tablet";
+import { CreditGroups } from "@/components/layout/credit-groups";
 import { Halo } from "@/components/ui/halo";
 import { Reveal } from "@/components/ui/reveal";
-import { site } from "@/lib/site";
+import { eventDateLabel, site } from "@/lib/site";
 
 export function Hero() {
   return (
@@ -18,9 +19,11 @@ export function Hero() {
             <div className="ctc-chip ctc-chip--solid ctc-slant-8">
               {site.season}
             </div>
-            <div className="ctc-chip ctc-chip--light ctc-slant-8">
-              {site.format}
-            </div>
+            {eventDateLabel && (
+              <div className="ctc-chip ctc-chip--light ctc-slant-8">
+                <time dateTime={site.eventStart}>{eventDateLabel.toUpperCase()}</time>
+              </div>
+            )}
           </Reveal>
 
           <Reveal as="h1" delay={100} className="ctc-hero-title">
@@ -55,12 +58,7 @@ export function Hero() {
           </Reveal>
 
           <Reveal delay={520} className="ctc-hero-credits">
-            <div className="ctc-countdown-label">ORGANIZED BY</div>
-            <div className="ctc-hero-credits-row">
-              {site.organizers.map((organizer) => (
-                <div key={organizer}>{organizer}</div>
-              ))}
-            </div>
+            <CreditGroups tone="light" />
           </Reveal>
         </div>
 

@@ -32,10 +32,14 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // intentional, so it does not warn and does not fight route transitions.
     <html lang="en" className={fontVariables} data-scroll-behavior="smooth">
       <head>
-        {/* Scroll reveals are opt-out, not opt-in: without JS, show everything. */}
+        {/* Scroll reveals are opt-out, not opt-in: without JS, show everything.
+            Likewise the collapsed mobile menu cannot open, so lay the nav out. */}
         <noscript>
           <style>{
-            `[data-reveal][data-revealed="false"]{opacity:1!important;filter:none!important;transform:none!important}`
+            `[data-reveal][data-revealed="false"]{opacity:1!important;filter:none!important;transform:none!important}` +
+            `.ctc-nav-toggle{display:none!important}` +
+            `.ctc-header-inner{flex-wrap:wrap!important}` +
+            `.ctc-nav{position:static!important;visibility:visible!important;opacity:1!important;transform:none!important;pointer-events:auto!important;flex:1 0 100%!important;flex-direction:row!important;flex-wrap:wrap!important;padding:0!important;box-shadow:none!important;border:0!important}`
           }</style>
         </noscript>
       </head>
