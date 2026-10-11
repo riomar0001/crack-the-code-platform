@@ -42,14 +42,14 @@ export function Countdown({ target }: CountdownProps) {
     return () => window.clearInterval(timer);
   }, [targetMs]);
 
-  const started = remaining === 0;
+  // Once the operation has begun there is nothing left to count down to.
+  if (remaining === 0) return null;
+
   const parts = split(remaining ?? 0);
 
   return (
     <div className="ctc-countdown-block">
-      <div className="ctc-countdown-label">
-        {started ? "MISSION IN PROGRESS" : "OPERATION BEGINS IN"}
-      </div>
+      <div className="ctc-countdown-label">OPERATION BEGINS IN</div>
 
       <ul className="ctc-countdown">
         {parts.map((value, index) => (

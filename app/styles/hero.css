@@ -68,6 +68,12 @@
   margin-top: 4px;
 }
 
+/* The countdown renders nothing once the event has started; do not leave its
+   empty wrapper taking up flex-gap space. */
+.ctc-hero-copy > [data-reveal]:empty {
+  display: none;
+}
+
 .ctc-hero-credits {
   padding-top: 22px;
   border-top: 1px solid var(--ctc-hairline);

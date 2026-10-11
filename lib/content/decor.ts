@@ -3,8 +3,8 @@
  * the fake terminal session, and the drifting sky.
  */
 
+/** The registration status item is added by the ticker itself, so it can follow the deadline. */
 export const tickerItems = [
-  "REGISTRATION OPEN",
   "BY UNIVERSITY OF MINDANAO COLLEGE OF COMPUTING EDUCATION",
   "OPEN TO ALL CCE STUDENTS",
   "UNIVERSITY OF MINDANAO COLLEGE OF COMPUTING EDUCATION: SKILLS CLINIC",

@@ -162,6 +162,14 @@
   transform: translateY(-2px);
 }
 
+/* Shown in place of a primary button once registration has closed. */
+.ctc-btn--closed {
+  background: var(--ctc-chip);
+  color: var(--ctc-muted-dark);
+  border: 2px dashed var(--ctc-border-hi);
+  cursor: default;
+}
+
 /* Size variants */
 
 .ctc-btn--sm {

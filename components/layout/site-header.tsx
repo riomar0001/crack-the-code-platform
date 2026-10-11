@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 
 import { BrandMark } from "@/components/layout/brand-mark";
 import { markIntroSeen } from "@/components/layout/intro-state";
+import { useRegistrationOpen } from "@/lib/registration/use-registration-open";
 import { mainNav } from "@/lib/site";
 
 const NAV_ID = "ctc-site-nav";
@@ -17,6 +18,7 @@ const NAV_ID = "ctc-site-nav";
  */
 export function SiteHeader() {
   const pathname = usePathname();
+  const registrationOpen = useRegistrationOpen();
 
   // The menu is open only for the route it was opened on, so navigating
   // anywhere closes it without needing an effect to reset state.
@@ -64,19 +66,23 @@ export function SiteHeader() {
           ))}
 
           {/* Phones have no room for the header button, so it lives here. */}
-          <Link
-            href="/register"
-            className="ctc-btn ctc-btn--primary ctc-btn--sm ctc-slant-10 ctc-nav-cta"
-            onClick={close}
-          >
-            REGISTER
-          </Link>
+          {registrationOpen && (
+            <Link
+              href="/register"
+              className="ctc-btn ctc-btn--primary ctc-btn--sm ctc-slant-10 ctc-nav-cta"
+              onClick={close}
+            >
+              REGISTER
+            </Link>
+          )}
         </nav>
 
         <div className="ctc-header-actions">
-          <Link href="/register" className="ctc-btn ctc-btn--primary ctc-btn--sm ctc-slant-10">
-            REGISTER
-          </Link>
+          {registrationOpen && (
+            <Link href="/register" className="ctc-btn ctc-btn--primary ctc-btn--sm ctc-slant-10">
+              REGISTER
+            </Link>
+          )}
 
           <button
             type="button"

@@ -1,15 +1,34 @@
 import type { Metadata } from "next";
+import { connection } from "next/server";
+import { Suspense } from "react";
 
 import { SkyLayer } from "@/components/decor/sky-layer";
 import { RegisterForm } from "@/components/register/register-form";
+import { RegistrationClosed } from "@/components/register/registration-closed";
 import { RulesReadout } from "@/components/register/rules-readout";
 import { Reveal } from "@/components/ui/reveal";
+import { isRegistrationOpen, registrationClosesLabel } from "@/lib/registration/window";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Team Registration",
   description: `Register your squad of ${site.minMembers}–${site.maxMembers} for ${site.fullName}. Open to all College of Computing Education students.`,
 };
+
+/**
+ * Decides open vs closed per request. `connection()` keeps this out of the
+ * prerender, so the answer reflects the clock at request time rather than the
+ * moment the site was built.
+ */
+async function RegistrationGate() {
+  await connection();
+
+  return isRegistrationOpen() ? (
+    <RegisterForm rules={<RulesReadout />} />
+  ) : (
+    <RegistrationClosed />
+  );
+}
 
 export default function RegisterPage() {
   return (
@@ -25,12 +44,14 @@ export default function RegisterPage() {
           <p className="ctc-register-lede">
             Open to all students currently enrolled in the College of Computing Education (CCE).
             Teams have {site.minMembers} to {site.maxMembers} members, all CCE students. Register
-            your team name and all members before the announced deadline. The captain registers the
+            your team name and all members before registration closes{registrationClosesLabel ? ` on ${registrationClosesLabel}` : ""}. The captain registers the
             team and receives a team code to share with the squad. Teammates then join with that code.
           </p>
         </div>
 
-        <RegisterForm rules={<RulesReadout />} />
+        <Suspense fallback={<div className="ctc-form-skeleton" aria-busy />}>
+          <RegistrationGate />
+        </Suspense>
       </div>
     </section>
   );

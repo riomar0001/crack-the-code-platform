@@ -31,6 +31,13 @@
   text-wrap: pretty;
 }
 
+/* Holds the form's place while the page decides whether registration is open. */
+.ctc-form-skeleton {
+  min-height: 520px;
+  background: #fff;
+  border: 1px solid var(--ctc-border);
+}
+
 .ctc-register-grid {
   display: flex;
   flex-wrap: wrap;

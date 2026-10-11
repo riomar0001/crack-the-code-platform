@@ -12,6 +12,7 @@ import {
   type RegistrationState,
   type RegistrationValues,
 } from "@/lib/registration/types";
+import { isRegistrationOpen, REGISTRATION_CLOSED_MESSAGE } from "@/lib/registration/window";
 import { site } from "@/lib/site";
 
 /**
@@ -57,6 +58,13 @@ export async function registerTeam(
   formData: FormData,
 ): Promise<RegistrationState> {
   const values = readValues(formData);
+
+  // The deadline is enforced here, not in the page: a form left open in a tab
+  // before the cutoff must not be able to register afterwards.
+  if (!isRegistrationOpen()) {
+    return { status: "error", formError: REGISTRATION_CLOSED_MESSAGE, fieldErrors: {}, values };
+  }
+
   const parsed = registrationSchema.safeParse(values);
 
   if (!parsed.success) {
@@ -119,6 +127,10 @@ export async function registerTeam(
  */
 export async function joinTeam(_previous: JoinState, formData: FormData): Promise<JoinState> {
   const text = (key: string) => String(formData.get(key) ?? "");
+
+  if (!isRegistrationOpen()) {
+    return { status: "error", formError: REGISTRATION_CLOSED_MESSAGE, fieldErrors: {} };
+  }
 
   const parsed = joinSchema.safeParse({
     teamCode: text("teamCode"),

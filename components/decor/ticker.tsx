@@ -1,3 +1,4 @@
+import { RegistrationStatus } from "@/components/decor/registration-status";
 import { tickerItems } from "@/lib/content/decor";
 
 /**
@@ -7,6 +8,10 @@ import { tickerItems } from "@/lib/content/decor";
 export function Ticker() {
   const row = (copy: string) => (
     <>
+      <span className="ctc-ticker-item">
+        <i aria-hidden>◆</i>
+        <RegistrationStatus />
+      </span>
       {tickerItems.map((item, index) => (
         <span key={`${copy}-${index}`} className="ctc-ticker-item">
           <i aria-hidden>◆</i>

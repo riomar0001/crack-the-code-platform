@@ -23,6 +23,15 @@ export const site = {
    */
   eventStart: process.env.NEXT_PUBLIC_EVENT_START ?? "2026-10-30T09:00:00+08:00",
 
+  /**
+   * The moment registration closes, ISO 8601 with offset. The default is the end
+   * of October 29, the day before the event. Override per-deployment with
+   * NEXT_PUBLIC_REGISTRATION_CLOSES. A value that does not parse as a date is
+   * ignored and registration stays open, rather than closing by mistake.
+   */
+  registrationCloses:
+    process.env.NEXT_PUBLIC_REGISTRATION_CLOSES ?? "2026-10-29T23:59:59+08:00",
+
   /** Email domain every participant must register under. */
   emailDomain: "umindanao.edu.ph",
   emailPlaceholder: "you@umindanao.edu.ph",

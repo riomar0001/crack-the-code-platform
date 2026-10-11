@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SkyLayer } from "@/components/decor/sky-layer";
 import { Countdown } from "@/components/landing/countdown";
 import { OperatorTablet } from "@/components/landing/operator-tablet";
+import { RegisterCta } from "@/components/landing/register-cta";
 import { CreditGroups } from "@/components/layout/credit-groups";
 import { Halo } from "@/components/ui/halo";
 import { Reveal } from "@/components/ui/reveal";
@@ -43,12 +44,7 @@ export function Hero() {
           </Reveal>
 
           <Reveal delay={420} className="ctc-hero-actions">
-            <Link
-              href="/register"
-              className="ctc-btn ctc-btn--primary ctc-btn--lg ctc-slant-14"
-            >
-              REGISTER TEAM <span style={{ fontSize: 16 }}>▶</span>
-            </Link>
+            <RegisterCta />
             <Link
               href="/#faq"
               className="ctc-btn ctc-btn--ghost ctc-btn--lg ctc-slant-14"
