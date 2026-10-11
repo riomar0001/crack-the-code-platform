@@ -1,0 +1,241 @@
+/* ==========================================================================
+   Rules modal — the "read to the end" dialog on the registration forms
+   ========================================================================== */
+
+/* A <dialog> keeps the page scrollable behind it; stop that while it is open. */
+body:has(.ctc-modal[open]) {
+  overflow: hidden;
+}
+
+.ctc-modal {
+  /* `dialog` is only displayed while [open]; setting display here would
+     override that, so the flex layout is applied to the open state only. */
+  width: min(760px, calc(100% - 32px));
+  max-height: min(86dvh, 780px);
+  padding: 0;
+  border: 1px solid var(--ctc-border);
+  background: #fff;
+  color: var(--ctc-navy);
+  box-shadow: 0 40px 90px -30px rgb(14 26 51 / 0.6);
+  overflow: hidden;
+}
+
+.ctc-modal[open] {
+  display: flex;
+  flex-direction: column;
+  animation: ctc-modal-in 0.28s var(--ctc-ease);
+}
+
+.ctc-modal::backdrop {
+  background: rgb(14 26 51 / 0.62);
+  backdrop-filter: blur(3px);
+}
+
+@keyframes ctc-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.98);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Header
+   -------------------------------------------------------------------------- */
+
+.ctc-modal-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px clamp(18px, 3vw, 28px);
+  background: var(--ctc-navy);
+  color: #fff;
+}
+
+.ctc-modal-eyebrow {
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  color: var(--ctc-yellow);
+}
+
+.ctc-modal-head h2 {
+  margin: 4px 0 0;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(22px, 3.2vw, 30px);
+  line-height: 1.05;
+}
+
+.ctc-modal-close {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--ctc-navy-line);
+  background: transparent;
+  color: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.ctc-modal-close:hover {
+  background: var(--ctc-navy-line);
+}
+
+.ctc-modal-close:focus-visible {
+  outline-color: var(--ctc-yellow);
+}
+
+/* --------------------------------------------------------------------------
+   Scrolling body
+   -------------------------------------------------------------------------- */
+
+.ctc-modal-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px clamp(18px, 3vw, 28px) 28px;
+}
+
+.ctc-readout section + section {
+  margin-top: 36px;
+  padding-top: 8px;
+  border-top: 3px solid var(--ctc-navy);
+}
+
+.ctc-readout-title {
+  margin: 20px 0 6px;
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1;
+}
+
+.ctc-readout-lede {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--ctc-ink);
+}
+
+.ctc-readout-note {
+  margin: 8px 0 0;
+  padding: 16px 20px;
+  background: var(--ctc-navy);
+  color: #fff;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+.ctc-readout-note b {
+  margin-right: 8px;
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  color: var(--ctc-yellow);
+}
+
+/* --------------------------------------------------------------------------
+   Footer: progress + actions
+   -------------------------------------------------------------------------- */
+
+.ctc-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px 24px;
+  padding: 16px clamp(18px, 3vw, 28px);
+  border-top: 1px solid var(--ctc-border);
+  background: var(--ctc-panel);
+}
+
+.ctc-modal-progress {
+  flex: 1 1 220px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ctc-muted-dark);
+}
+
+.ctc-modal-progress-bar {
+  height: 4px;
+  background: var(--ctc-border);
+}
+
+.ctc-modal-progress-bar span {
+  display: block;
+  height: 100%;
+  background: var(--ctc-blue);
+  transition: width 0.15s linear;
+}
+
+.ctc-modal-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* --------------------------------------------------------------------------
+   Checkbox side: the link that opens the modal
+   -------------------------------------------------------------------------- */
+
+.ctc-agree-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ctc-agree label {
+  cursor: pointer;
+}
+
+.ctc-read-link {
+  align-self: flex-start;
+  margin-left: 30px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--ctc-blue);
+  font-family: var(--font-saira), sans-serif;
+  font-weight: 800;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  cursor: pointer;
+}
+
+.ctc-read-link:hover {
+  color: var(--ctc-blue-dark);
+}
+
+@media (max-width: 560px) {
+  .ctc-modal {
+    width: calc(100% - 20px);
+    max-height: 92dvh;
+  }
+
+  .ctc-modal-actions {
+    width: 100%;
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .ctc-modal-actions .ctc-btn,
+  .ctc-modal-actions .ctc-btn-quiet {
+    width: 100%;
+  }
+
+  .ctc-modal-actions .ctc-btn {
+    padding-inline: 16px;
+    font-size: 16px;
+  }
+}

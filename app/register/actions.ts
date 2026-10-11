@@ -1,10 +1,14 @@
 "use server";
 
+import { after } from "next/server";
+
+import { sendJoinEmail, sendRegistrationEmails } from "@/lib/email/notifications";
 import { describeError } from "@/lib/errors";
-import { saveRegistration } from "@/lib/registration/repository";
-import { registrationSchema } from "@/lib/registration/schema";
+import { joinTeam as joinTeamRecord, saveRegistration } from "@/lib/registration/repository";
+import { joinSchema, registrationSchema } from "@/lib/registration/schema";
 import {
   type FieldErrors,
+  type JoinState,
   type RegistrationState,
   type RegistrationValues,
 } from "@/lib/registration/types";
@@ -79,6 +83,16 @@ export async function registerTeam(
       };
     }
 
+    // Confirmation emails go out after the response, so a slow mail server
+    // never holds up the form; a failed send is logged, never surfaced.
+    after(() =>
+      sendRegistrationEmails({
+        teamName: parsed.data.teamName,
+        teamCode: result.teamCode,
+        members: parsed.data.members,
+      }),
+    );
+
     return {
       status: "success",
       teamName: parsed.data.teamName,
@@ -93,6 +107,68 @@ export async function registerTeam(
       formError: "Something went wrong saving your squad. Please try again in a moment.",
       fieldErrors: {},
       values,
+    };
+  }
+}
+
+/**
+ * A teammate adding themselves to an existing squad by team code.
+ *
+ * The code is the only credential, so a wrong code and a full squad answer
+ * with the same sort of message the form shows beside the code field.
+ */
+export async function joinTeam(_previous: JoinState, formData: FormData): Promise<JoinState> {
+  const text = (key: string) => String(formData.get(key) ?? "");
+
+  const parsed = joinSchema.safeParse({
+    teamCode: text("teamCode"),
+    agree: formData.get("agree") === "on",
+    members: [
+      {
+        alias: text("members.0.alias"),
+        firstName: text("members.0.firstName"),
+        lastName: text("members.0.lastName"),
+        studentId: text("members.0.studentId"),
+        email: text("members.0.email"),
+      },
+    ],
+  });
+
+  if (!parsed.success) {
+    const fieldErrors = toFieldErrors(parsed.error.issues);
+
+    return { status: "error", formError: fieldErrors.agree, fieldErrors };
+  }
+
+  try {
+    const result = await joinTeamRecord(parsed.data);
+
+    if (!result.ok) {
+      return { status: "error", formError: result.formError, fieldErrors: result.fieldErrors };
+    }
+
+    after(() =>
+      sendJoinEmail({
+        teamName: result.teamName,
+        teamCode: parsed.data.teamCode,
+        member: parsed.data.members[0],
+        roster: result.roster,
+      }),
+    );
+
+    return {
+      status: "success",
+      teamName: result.teamName,
+      alias: parsed.data.members[0].alias,
+      roster: result.roster,
+    };
+  } catch (error) {
+    console.error("[register] join failed:", describeError(error));
+
+    return {
+      status: "error",
+      formError: "Something went wrong joining that squad. Please try again in a moment.",
+      fieldErrors: {},
     };
   }
 }

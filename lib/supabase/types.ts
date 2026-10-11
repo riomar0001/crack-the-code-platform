@@ -1,5 +1,5 @@
 /**
- * Hand-maintained mirror of `supabase/migrations/0001_init.sql`.
+ * Hand-maintained mirror of the `supabase/migrations/` schema.
  *
  * Regenerate with:
  *   npx supabase gen types typescript --project-id <ref> > lib/supabase/types.ts
@@ -75,6 +75,13 @@ export type Database = {
           p_members: RegisterTeamMember[];
         };
         Returns: TeamRow;
+      };
+      join_team: {
+        Args: {
+          p_team_code: string;
+          p_member: RegisterTeamMember;
+        };
+        Returns: { teamName: string; roster: string[] };
       };
     };
     Enums: Record<never, never>;

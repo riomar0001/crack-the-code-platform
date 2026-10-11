@@ -387,6 +387,16 @@ html {
     padding: 36px var(--ctc-gutter) 64px;
   }
 
+  .ctc-mode {
+    align-self: stretch;
+  }
+
+  .ctc-mode button {
+    flex: 1 1 0;
+    padding: 11px 8px;
+    font-size: 14px;
+  }
+
   .ctc-doc-hero {
     padding: 36px var(--ctc-gutter) 28px;
   }
@@ -440,8 +450,10 @@ html {
     color: var(--ctc-navy);
   }
 
+  /* The fill is a pseudo-element now; keep the nav hover from tinting the box. */
   .ctc-nav a.ctc-nav-cta:hover {
-    background: var(--ctc-yellow-soft);
+    --btn-fill: var(--ctc-yellow-soft);
+    background: transparent;
     color: var(--ctc-navy);
   }
 }

@@ -27,15 +27,129 @@
 
 /* Colour variants */
 
+/* Primary buttons glow: a bright highlight spins around the rim while the
+   whole shape pulses with light.
+
+   The angled cut cannot live on the button itself, because clip-path would
+   also clip the glow. So the shape moves onto two pseudo-elements (the rim
+   light and the yellow fill), and the glow is a drop-shadow filter on the
+   button, which follows whatever the pseudo-elements draw. The cuts are in
+   `--cut`, set per slant class below. */
+
+@property --ctc-spin {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .ctc-btn--primary {
-  background: var(--ctc-yellow);
+  --btn-fill: var(--ctc-yellow);
+  --ring: 3px;
+  position: relative;
+  isolation: isolate;
+  background: transparent;
   color: var(--ctc-navy);
+  clip-path: none;
+  animation: ctc-btn-glow 2.4s ease-in-out infinite;
+}
+
+.ctc-btn--primary.ctc-btn--sm {
+  --ring: 2px;
+}
+
+.ctc-btn--primary.ctc-slant-8 {
+  --cut: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+}
+
+.ctc-btn--primary.ctc-slant-10 {
+  --cut: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+}
+
+.ctc-btn--primary.ctc-slant-12 {
+  --cut: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%);
+}
+
+.ctc-btn--primary.ctc-slant-14 {
+  --cut: polygon(14px 0, 100% 0, calc(100% - 14px) 100%, 0 100%);
+}
+
+.ctc-btn--primary.ctc-slant-16 {
+  --cut: polygon(16px 0, 100% 0, calc(100% - 16px) 100%, 0 100%);
+}
+
+.ctc-btn--primary::before,
+.ctc-btn--primary::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  clip-path: var(--cut, none);
+}
+
+/* Rim light: a white-hot spot on an amber edge, circling the button. */
+.ctc-btn--primary::before {
+  inset: 0;
+  z-index: -2;
+  background: conic-gradient(
+    from var(--ctc-spin),
+    #fff 0deg,
+    #fff4b0 35deg,
+    #f2b200 110deg,
+    #f2b200 250deg,
+    #fff4b0 325deg,
+    #fff 360deg
+  );
+  animation: ctc-btn-spin 2.8s linear infinite;
+}
+
+/* The fill, inset so only a thin rim of the light shows around it. */
+.ctc-btn--primary::after {
+  inset: var(--ring);
+  z-index: -1;
+  background: var(--btn-fill);
+  transition: background 0.2s;
 }
 
 .ctc-btn--primary:hover:not(:disabled) {
-  background: var(--ctc-yellow-soft);
+  --btn-fill: var(--ctc-yellow-soft);
   color: var(--ctc-navy);
   transform: translateY(-2px);
+}
+
+.ctc-btn--primary:disabled,
+.ctc-btn--primary:disabled::before {
+  animation: none;
+}
+
+.ctc-btn--primary:disabled {
+  filter: none;
+}
+
+@keyframes ctc-btn-spin {
+  to {
+    --ctc-spin: 360deg;
+  }
+}
+
+@keyframes ctc-btn-glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 0 5px rgb(255 206 40 / 0.55));
+  }
+
+  50% {
+    filter: drop-shadow(0 0 14px rgb(255 226 100 / 0.95));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ctc-btn--primary,
+  .ctc-btn--primary::before {
+    animation: none;
+  }
+
+  .ctc-btn--primary {
+    filter: drop-shadow(0 0 8px rgb(255 214 64 / 0.7));
+  }
 }
 
 .ctc-btn--ghost {

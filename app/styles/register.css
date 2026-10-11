@@ -38,6 +38,49 @@
   align-items: flex-start;
 }
 
+/* Holds the mode switch above whichever form is showing. */
+.ctc-register-flow {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Two-way switch: new team / join with a code. */
+.ctc-mode {
+  display: inline-flex;
+  align-self: flex-start;
+  max-width: 100%;
+  gap: 4px;
+  padding: 4px;
+  background: #fff;
+  border: 1px solid var(--ctc-border);
+}
+
+.ctc-mode button {
+  padding: 11px 22px;
+  border: 0;
+  background: transparent;
+  color: var(--ctc-navy);
+  font-family: var(--font-saira), sans-serif;
+  font-style: italic;
+  font-weight: 900;
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.ctc-mode button:hover {
+  background: var(--ctc-chip);
+}
+
+.ctc-mode button[aria-pressed="true"] {
+  background: var(--ctc-blue);
+  color: #fff;
+}
+
 /* --------------------------------------------------------------------------
    Form shell
    -------------------------------------------------------------------------- */
@@ -102,6 +145,25 @@
   font-size: 13px;
   font-weight: 700;
   color: var(--ctc-rose);
+}
+
+.ctc-hint {
+  font-size: 13px;
+  color: var(--ctc-muted-dark);
+}
+
+/* Team codes are read aloud and copied off a screen: monospace, spaced. */
+.ctc-input--code {
+  font-family: var(--font-mono), monospace;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.ctc-input--code::placeholder {
+  letter-spacing: 0.12em;
+  text-transform: none;
 }
 
 /* --------------------------------------------------------------------------
@@ -402,4 +464,37 @@
 
 .ctc-squad-slot--empty .ctc-squad-slot-name {
   color: var(--ctc-muted-dark);
+}
+
+/* --------------------------------------------------------------------------
+   Join-with-code explainer, styled to sit beside the form like the squad card
+   -------------------------------------------------------------------------- */
+
+.ctc-join-aside {
+  flex: 1 1 280px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 22px;
+  background: var(--ctc-navy);
+  color: var(--ctc-on-navy);
+  border: 3px solid #fff;
+  border-radius: 18px;
+  box-shadow: 0 30px 60px -24px rgb(18 90 180 / 0.45);
+}
+
+.ctc-join-aside ol {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 0;
+  padding-left: 22px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.ctc-join-aside li::marker {
+  color: var(--ctc-yellow);
+  font-weight: 800;
 }

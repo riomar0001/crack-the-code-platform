@@ -2,6 +2,8 @@ import { z } from "zod";
 
 import { site } from "@/lib/site";
 
+import { normalizeTeamCode, TEAM_CODE_PATTERN } from "./team-code-format";
+
 /**
  * Accepts the organisation domain and any subdomain of it, e.g.
  * `juan@umindanao.edu.ph` and `juan@cce.umindanao.edu.ph`.
@@ -89,5 +91,20 @@ export const registrationSchema = z
     }
   });
 
+/**
+ * A teammate joining an existing squad. `members` is a one-element array on
+ * purpose, so field errors come back as `members.0.email` — the same keys the
+ * shared member row already looks up.
+ */
+export const joinSchema = z.object({
+  teamCode: z
+    .string()
+    .transform(normalizeTeamCode)
+    .pipe(z.string().regex(TEAM_CODE_PATTERN, "That does not look like a team code (CTC-XXXX-XXXX).")),
+  members: z.array(memberSchema).length(1),
+  agree: z.literal(true, { error: "Please accept the rules to continue." }),
+});
+
 export type MemberInput = z.infer<typeof memberSchema>;
 export type RegistrationInput = z.infer<typeof registrationSchema>;
+export type JoinInput = z.infer<typeof joinSchema>;

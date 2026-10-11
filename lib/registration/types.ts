@@ -37,6 +37,24 @@ export type RegistrationValues = {
   agree: boolean;
 };
 
+/** Outcome of joining an existing squad with its team code. */
+export type JoinState =
+  | { status: "idle" }
+  | {
+      status: "error";
+      formError?: string;
+      /** `teamCode`, `members.0.email`, … */
+      fieldErrors: FieldErrors;
+    }
+  | {
+      status: "success";
+      teamName: string;
+      /** The joiner's own alias, for the confirmation. */
+      alias: string;
+      /** Everyone on the squad now, captain first. */
+      roster: string[];
+    };
+
 export const emptyMember = (): MemberValues => ({
   alias: "",
   firstName: "",
@@ -46,6 +64,7 @@ export const emptyMember = (): MemberValues => ({
 });
 
 export const initialRegistrationState: RegistrationState = { status: "idle" };
+export const initialJoinState: JoinState = { status: "idle" };
 
 /** Field key for a given member index, matching the `name` attributes. */
 export const memberFieldName = (index: number, field: keyof MemberValues) =>

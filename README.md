@@ -49,6 +49,8 @@ Run the migrations in order in the Supabase SQL editor, or:
 ```bash
 psql "$DIRECT_URL" -f supabase/migrations/0001_init.sql
 psql "$DIRECT_URL" -f supabase/migrations/0002_fix_pgcrypto_search_path.sql
+psql "$DIRECT_URL" -f supabase/migrations/0003_ctfd_sync_state.sql
+psql "$DIRECT_URL" -f supabase/migrations/0004_join_team.sql
 ```
 
 `0001` creates `teams`, `team_members` and `register_team`. `0002` re-applies
@@ -57,13 +59,36 @@ pre-installs pgcrypto there, and without it every registration fails with
 `function gen_random_bytes(integer) does not exist`. It is idempotent, and
 harmless on a database created from the current `0001`.
 
-Both end with a self-test that raises if password generation is broken, so a
+`0003` adds the CTFd sync columns and `0004` adds `join_team`, which lets a
+teammate join an existing squad with its team code (it locks the team row, so
+a squad can never go past four members).
+
+`0001` and `0002` end with a self-test that raises if password generation is broken, so a
 successful run means credentials work.
 
 ### 3. Optional
 
 `NEXT_PUBLIC_EVENT_START` overrides the countdown target (ISO 8601 with
 offset). Defaults to `2026-10-30T09:00:00+08:00`.
+
+### 4. Confirmation emails
+
+Registering a team emails every member, and joining a team emails the new
+member, over SMTP (`lib/email/`). Set these in `.env`:
+
+```
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"                 # 465 = implicit TLS, 587 = STARTTLS
+SMTP_USER="..."
+SMTP_PASSWORD="..."             # an app password, not your account password
+SMTP_FROM="Crack The Code <hello@example.com>"
+SITE_URL="https://your-domain"  # absolute links in emails (the Rules button)
+```
+
+Email is best-effort: it is sent after the response, and a missing config or a
+mail-server error is logged but never fails the registration. `SITE_URL` is set
+explicitly because links are never built from the request's `Host` header.
+The templates are in `lib/email/templates.ts`.
 
 ## How registration works
 
@@ -210,7 +235,7 @@ app/
 components/
   layout/          Header, footer, wordmark, intro curtain
   landing/         Hero, countdown, terminal, mission select, FAQ
-  register/        Form, member row, squad card, confirmation
+  register/        Form, join form, rules modal, member row, squad card
   docs/            Legal document renderer
   decor/           Purely ornamental layers (sky, ticker, backdrops)
   ui/              Reveal, Halo, HexBadge
@@ -219,6 +244,7 @@ lib/
   registration/    Schema, team codes, repository, shared types
   admin/           Bearer auth, registration queries, CSV writer
   ctfd/            CTFd API client and sync orchestration
+  email/           SMTP client, confirmation email templates
   supabase/        Admin client and database types
   site.ts          Event config — dates, org names, team-size limits
 supabase/migrations/

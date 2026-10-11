@@ -10,7 +10,12 @@ type MemberFieldsProps = {
   value: MemberValues;
   fieldErrors: FieldErrors;
   onChange: (field: keyof MemberValues, value: string) => void;
-  onRemove: () => void;
+  /** Omit for a row that cannot be removed (e.g. someone joining a squad). */
+  onRemove?: () => void;
+  /** Row 0 is the captain unless told otherwise. */
+  captain?: boolean;
+  /** Badge for a non-captain row; defaults to the row number. */
+  badge?: string;
 };
 
 const FIELDS = [
@@ -37,23 +42,25 @@ export function MemberFields({
   fieldErrors,
   onChange,
   onRemove,
+  captain,
+  badge,
 }: MemberFieldsProps) {
-  const isCaptain = index === 0;
+  const isCaptain = captain ?? index === 0;
   const errorFor = (field: keyof MemberValues) => fieldErrors[memberFieldName(index, field)];
 
   const errors = (["alias", "firstName", "lastName", "studentId", "email"] as const)
     .map((field) => errorFor(field))
     .filter((message): message is string => Boolean(message));
 
-  const who = isCaptain ? "captain" : `member ${index + 1}`;
+  const who = isCaptain ? "captain" : onRemove ? `member ${index + 1}` : "you";
 
   return (
     <Reveal
       direction="left"
-      className={isCaptain ? "ctc-member" : "ctc-member ctc-member--removable"}
+      className={isCaptain || !onRemove ? "ctc-member" : "ctc-member ctc-member--removable"}
     >
       <HexBadge size={36} background={isCaptain ? "var(--ctc-yellow)" : "var(--ctc-chip)"}>
-        {isCaptain ? "C" : index + 1}
+        {isCaptain ? "C" : (badge ?? index + 1)}
       </HexBadge>
 
       <div className="ctc-member-inputs">
@@ -87,7 +94,7 @@ export function MemberFields({
         />
       </div>
 
-      {!isCaptain && (
+      {!isCaptain && onRemove && (
         <button
           type="button"
           className="ctc-member-remove"

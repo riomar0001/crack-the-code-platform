@@ -3,11 +3,17 @@ import "server-only";
 import { getSupabaseAdmin } from "@/lib/supabase/admin";
 
 import { generateTeamCode } from "./team-code";
-import type { RegistrationInput } from "./schema";
+import type { JoinInput, MemberInput, RegistrationInput } from "./schema";
 import type { FieldErrors } from "./types";
 
 /** Postgres unique-violation. */
 const UNIQUE_VIOLATION = "23505";
+
+/** Custom SQLSTATEs raised by `join_team` in migrations/0004_join_team.sql. */
+const JOIN_ERROR = {
+  teamNotFound: "CTC01",
+  teamFull: "CTC02",
+} as const;
 
 /** Constraint names declared in supabase/migrations/0001_init.sql. */
 const CONSTRAINT = {
@@ -27,6 +33,9 @@ export type SaveResult =
   | { ok: true; teamCode: string }
   | { ok: false; formError?: string; fieldErrors: FieldErrors };
 
+/** The failure half of a save/join result, shared by both flows. */
+type SaveFailure = { ok: false; formError?: string; fieldErrors: FieldErrors };
+
 type PostgresError = { code?: string; message?: string; details?: string };
 
 function mentions(error: PostgresError, constraint: string): boolean {
@@ -41,7 +50,7 @@ function conflictingValue(error: PostgresError): string | null {
   return error.details?.match(/Key \([^)]+\)=\(([^)]*)\)/)?.[1] ?? null;
 }
 
-function mapUniqueViolation(error: PostgresError, input: RegistrationInput): SaveResult {
+function mapUniqueViolation(error: PostgresError, members: MemberInput[]): SaveFailure {
   if (mentions(error, CONSTRAINT.teamName)) {
     return {
       ok: false,
@@ -71,7 +80,7 @@ function mapUniqueViolation(error: PostgresError, input: RegistrationInput): Sav
 
     const raw = conflictingValue(error);
     const value = raw ? conflict.normalize(raw) : null;
-    const index = input.members.findIndex((member) => member[conflict.field] === value);
+    const index = members.findIndex((member) => member[conflict.field] === value);
 
     return index >= 0
       ? { ok: false, fieldErrors: { [`members.${index}.${conflict.field}`]: conflict.message } }
@@ -127,7 +136,7 @@ export async function saveRegistration(input: RegistrationInput): Promise<SaveRe
       continue;
     }
 
-    return mapUniqueViolation(error, input);
+    return mapUniqueViolation(error, input.members);
   }
 
   return {
@@ -135,4 +144,45 @@ export async function saveRegistration(input: RegistrationInput): Promise<SaveRe
     formError: "Could not allocate a team code. Please try again.",
     fieldErrors: {},
   };
+}
+
+export type JoinResult =
+  | { ok: true; teamName: string; roster: string[] }
+  | { ok: false; formError?: string; fieldErrors: FieldErrors };
+
+/**
+ * Adds one member to an existing team, found by its code.
+ *
+ * Runs in the `join_team` Postgres function, which locks the team row, so two
+ * people joining at once cannot overfill a squad.
+ */
+export async function joinTeam(input: JoinInput): Promise<JoinResult> {
+  const { data, error } = await getSupabaseAdmin().rpc("join_team", {
+    p_team_code: input.teamCode,
+    p_member: input.members[0],
+  });
+
+  if (!error) {
+    return { ok: true, teamName: data.teamName, roster: data.roster };
+  }
+
+  if (error.code === JOIN_ERROR.teamNotFound) {
+    return {
+      ok: false,
+      fieldErrors: { teamCode: "No squad uses that team code. Check it with your captain." },
+    };
+  }
+
+  if (error.code === JOIN_ERROR.teamFull) {
+    return {
+      ok: false,
+      fieldErrors: { teamCode: "That squad is already full." },
+    };
+  }
+
+  if (error.code !== UNIQUE_VIOLATION) {
+    throw error;
+  }
+
+  return mapUniqueViolation(error, input.members);
 }

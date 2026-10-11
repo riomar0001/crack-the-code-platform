@@ -1,10 +1,11 @@
 import { randomInt } from "node:crypto";
 
-/** Crockford-style alphabet: no I, L, O, U, 0 or 1 to keep codes dictatable. */
-const ALPHABET = "ABCDEFGHJKMNPQRSTVWXYZ23456789";
-
-const GROUP_LENGTH = 4;
-const GROUPS = 2;
+import {
+  TEAM_CODE_ALPHABET as ALPHABET,
+  TEAM_CODE_GROUP_LENGTH as GROUP_LENGTH,
+  TEAM_CODE_GROUPS as GROUPS,
+  TEAM_CODE_PREFIX,
+} from "./team-code-format";
 
 /**
  * Builds a shareable team code, e.g. `CTC-7K2M-QW9X`.
@@ -17,7 +18,7 @@ export function generateTeamCode(): string {
     Array.from({ length: GROUP_LENGTH }, () => ALPHABET[randomInt(ALPHABET.length)]).join(""),
   );
 
-  return ["CTC", ...groups].join("-");
+  return [TEAM_CODE_PREFIX, ...groups].join("-");
 }
 
 /**

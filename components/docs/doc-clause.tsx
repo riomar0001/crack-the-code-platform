@@ -6,12 +6,19 @@ type DocClauseProps = {
   clause: DocClauseData;
   /** 1-based, rendered as the monospace "01" gutter number. */
   index: number;
+  /**
+   * Render without the scroll-reveal. For text inside a scroll container (the
+   * registration modal), where fading in as you read would only get in the way.
+   */
+  plain?: boolean;
 };
 
 /** One numbered section of a legal document. */
-export function DocClause({ clause, index }: DocClauseProps) {
+export function DocClause({ clause, index, plain }: DocClauseProps) {
+  const Shell = plain ? "div" : Reveal;
+
   return (
-    <Reveal className="ctc-clause">
+    <Shell className="ctc-clause">
       <div className="ctc-clause-num">{String(index).padStart(2, "0")}</div>
 
       <div className="ctc-clause-body">
@@ -41,6 +48,6 @@ export function DocClause({ clause, index }: DocClauseProps) {
           );
         })}
       </div>
-    </Reveal>
+    </Shell>
   );
 }

@@ -64,7 +64,7 @@ export type CreditGroup = {
  */
 export const credits: readonly CreditGroup[] = [
   {
-    label: "ORGANIZED BY",
+    label: "BY",
     entries: [
       {
         name: "University of Mindanao College of Computing Education",

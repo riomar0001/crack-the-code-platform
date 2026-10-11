@@ -22,7 +22,10 @@ export function EnlistedPanel({
         <div className="ctc-done-code">{teamCode}</div>
       </div>
 
-      <p>Save this code. Members use it to join the squad when they sign in.</p>
+      <p>
+        Save this code and share it with your squad. Teammates open Team Registration, choose
+        Join a team and enter it to add themselves.
+      </p>
 
       <div className="ctc-done-actions">
         <Link href="/" className="ctc-btn ctc-btn--primary ctc-btn--md ctc-slant-12">

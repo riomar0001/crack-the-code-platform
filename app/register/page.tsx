@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { SkyLayer } from "@/components/decor/sky-layer";
 import { RegisterForm } from "@/components/register/register-form";
+import { RulesReadout } from "@/components/register/rules-readout";
 import { Reveal } from "@/components/ui/reveal";
 import { site } from "@/lib/site";
 
@@ -25,11 +26,11 @@ export default function RegisterPage() {
             Open to all students currently enrolled in the College of Computing Education (CCE).
             Teams have {site.minMembers} to {site.maxMembers} members, all CCE students. Register
             your team name and all members before the announced deadline. The captain registers the
-            team and receives a team code to share with the squad.
+            team and receives a team code to share with the squad. Teammates then join with that code.
           </p>
         </div>
 
-        <RegisterForm />
+        <RegisterForm rules={<RulesReadout />} />
       </div>
     </section>
   );
