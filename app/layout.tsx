@@ -3,22 +3,53 @@ import type { Metadata, Viewport } from "next";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { fontVariables } from "@/lib/fonts";
+import { defaultTitle, getSiteUrl, seoDescription, socialImage } from "@/lib/seo";
 import { site } from "@/lib/site";
 
 import "./globals.css";
 
 export const metadata: Metadata = {
+  // Makes every relative URL below (canonicals, share images) absolute.
+  metadataBase: new URL(getSiteUrl()),
   title: {
-    default: `${site.fullName} · CTF Competition`,
+    default: defaultTitle,
     template: `%s · ${site.fullName}`,
   },
-  description: site.tagline,
+  description: seoDescription,
   applicationName: site.fullName,
+  authors: [{ name: site.byline }],
+  creator: site.byline,
+  keywords: [
+    "Crack The Code",
+    "CTF",
+    "capture the flag",
+    "University of Mindanao",
+    "College of Computing Education",
+    "cybersecurity competition",
+    "Davao City",
+  ],
+  // Pages set their own canonical (see lib/seo.ts); one here would point every
+  // page at the home page.
   openGraph: {
-    title: `${site.fullName} · CTF Competition`,
-    description: site.tagline,
+    title: defaultTitle,
+    description: seoDescription,
     siteName: site.fullName,
     type: "website",
+    locale: "en_PH",
+    url: "/",
+    images: [socialImage()],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: defaultTitle,
+    description: seoDescription,
+    images: [socialImage()],
+  },
+  // Indexing is the default, so no blanket `index, follow` (it would also sit
+  // beside the `noindex` Next adds to the 404 page). This only asks Google for
+  // large image previews and full-length snippets.
+  robots: {
+    googleBot: { "max-image-preview": "large", "max-snippet": -1 },
   },
 };
 

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 
 import { FaqBackdrop } from "@/components/decor/faq-backdrop";
@@ -7,13 +8,18 @@ import { FaqAccordion } from "@/components/landing/faq-accordion";
 import { Hero } from "@/components/landing/hero";
 import { MissionSelect } from "@/components/landing/mission-select";
 import { IntroCurtain } from "@/components/layout/intro-curtain";
+import { JsonLd } from "@/components/seo/json-ld";
 import { Reveal } from "@/components/ui/reveal";
 import { faqs } from "@/lib/content/faqs";
 import { missions } from "@/lib/content/missions";
+import { homeJsonLd, pageMetadata, seoDescription } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({ description: seoDescription, path: "/" });
 
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={homeJsonLd()} />
       <IntroCurtain />
 
       <Hero />

@@ -87,7 +87,7 @@ export const credits: readonly CreditGroup[] = [
     entries: [{ name: "DEVCON Davao", logo: "/credits/devcon-davao.webp" }],
   },
   {
-    label: "SUPPORTED BY",
+    label: "WITH THE SUPPORT OF",
     entries: [
       { name: "University of Mindanao CCE-CSG", logo: "/credits/um-cce-csg.webp" },
       {

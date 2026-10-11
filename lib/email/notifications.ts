@@ -3,6 +3,7 @@ import "server-only";
 import type { MemberInput } from "@/lib/registration/schema";
 
 import { listTeamMembers } from "@/lib/registration/repository";
+import { absoluteUrl } from "@/lib/seo";
 
 import { sendMail } from "./mailer";
 import {
@@ -12,28 +13,8 @@ import {
   type RosterEntry,
 } from "./templates";
 
-/**
- * Absolute base URL for links in emails.
- *
- * Deliberately not taken from the request's Host header: that is attacker
- * controlled, and an email carrying a link to someone else's domain is a
- * phishing vector. Set SITE_URL in production; on Vercel the production domain
- * is picked up automatically.
- */
-function siteUrl(): string | null {
-  const explicit = process.env.SITE_URL ?? process.env.NEXT_PUBLIC_SITE_URL;
-  if (explicit) return explicit.replace(/\/+$/, "");
-
-  const vercel = process.env.VERCEL_PROJECT_PRODUCTION_URL;
-  if (vercel) return `https://${vercel}`;
-
-  return process.env.NODE_ENV === "production" ? null : "http://localhost:3000";
-}
-
-function rulesUrl(): string | null {
-  const base = siteUrl();
-  return base ? `${base}/rules` : null;
-}
+/** Link to the Rules page, from the shared site URL (see `lib/seo.ts`). */
+const rulesUrl = (): string => absoluteUrl("/rules");
 
 const fullName = (member: MemberInput) => `${member.firstName} ${member.lastName}`;
 

@@ -99,6 +99,24 @@ mail-server error is logged but never fails the registration. `SITE_URL` is set
 explicitly because links are never built from the request's `Host` header.
 The templates are in `lib/email/templates.ts`.
 
+### 5. Search and link previews
+
+`lib/seo.ts` holds everything crawlers and chat apps read. The site's address
+defaults to `https://www.cce-crackthecode.dev`; set `SITE_URL` to override it
+(a staging domain, say). It feeds canonical URLs, `robots.txt`, `sitemap.xml`,
+the structured data and the links in emails, and is never taken from the
+request's `Host` header.
+
+- Each page gets its title, description, canonical URL and social tags from
+  `pageMetadata()`; new public pages should use it and be added to
+  `app/sitemap.ts`.
+- The home page carries schema.org `Event` data (dates come from `site.ts`).
+- `/admin` and `/api/` are kept out of `robots.txt`, and the admin page is `noindex`.
+- The link-preview picture is `public/social-preview.png` (1200 x 630). Chat apps
+  cache by URL, so to change it save a new file under a **new name** and update
+  `SOCIAL_IMAGE_PATH` in `lib/seo.ts`. After deploying, re-scrape the page in
+  Facebook's Sharing Debugger so old previews refresh.
+
 ## How registration works
 
 1. `components/register/register-form.tsx` holds the form state and submits

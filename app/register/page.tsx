@@ -8,12 +8,14 @@ import { RegistrationClosed } from "@/components/register/registration-closed";
 import { RulesReadout } from "@/components/register/rules-readout";
 import { Reveal } from "@/components/ui/reveal";
 import { isRegistrationOpen, registrationClosesLabel } from "@/lib/registration/window";
+import { pageMetadata } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Team Registration",
   description: `Register your squad of ${site.minMembers}–${site.maxMembers} for ${site.fullName}. Open to all College of Computing Education students.`,
-};
+  path: "/register",
+});
 
 /**
  * Decides open vs closed per request. `connection()` keeps this out of the
