@@ -367,15 +367,15 @@ type JoinEmailInput = {
 
 /** Sent to a teammate who has just joined an existing squad by its code. */
 export function joinConfirmationEmail(input: JoinEmailInput): EmailContent {
-  const intro = `You are now on the roster for ${input.teamName} at ${site.fullName}. Think your squad can crack them all? Prove it on ${eventDate}.`;
+  const intro = `You have successfully joined ${input.teamName} for ${site.fullName}. Think your squad can crack them all? Prove it on ${eventDate}.`;
   const codeNote =
     "This is your squad's team code. Share it with a teammate who has not joined yet, up to four members in all.";
   const reason = `You received this because you joined a squad for ${site.fullName}.`;
 
   return {
-    subject: oneLine(`You joined ${input.teamName} · ${site.fullName}`),
+    subject: oneLine(`You have joined ${input.teamName} · ${site.fullName}`),
     html: layout({
-      preheader: `You joined ${input.teamName} for ${site.fullName}. Your team code is inside.`,
+      preheader: `You have successfully joined ${input.teamName} for ${site.fullName}. Your team code is inside.`,
       title: `Squad joined · ${site.fullName}`,
       eyebrow: "SQUAD JOINED",
       headingHtml: `Welcome aboard,<br>${esc(input.alias)}`,
@@ -389,6 +389,56 @@ export function joinConfirmationEmail(input: JoinEmailInput): EmailContent {
     }),
     text: plainText({
       heading: `Welcome aboard, ${input.alias}`,
+      intro,
+      teamCode: input.teamCode,
+      codeNote,
+      rosterTitle: `${input.teamName.toUpperCase()} · SQUAD ROSTER`,
+      roster: input.roster,
+      rulesUrl: input.rulesUrl,
+      reason,
+    }),
+  };
+}
+
+type SquadmateJoinedInput = {
+  teamName: string;
+  teamCode: string;
+  newAlias: string;
+  newName: string;
+  /** Whole squad after the join, with the new member marked in `detail`. */
+  roster: RosterEntry[];
+  rulesUrl: string | null;
+};
+
+/** Sent to the members already on a squad when someone joins with its code. */
+export function squadmateJoinedEmail(input: SquadmateJoinedInput): EmailContent {
+  const count = input.roster.length;
+  const space =
+    count >= site.maxMembers
+      ? "Your squad is now full."
+      : `Your squad now has ${count} of ${site.maxMembers} members.`;
+
+  const intro = `${input.newAlias} (${input.newName}) has joined your team, ${input.teamName}, using your team code. ${space} If you do not recognise them, reply to this email and we will help.`;
+  const codeNote = `Anyone with this code can join your squad, so share it only with teammates you want on it. A squad holds up to ${site.maxMembers} members.`;
+  const reason = `You received this because you are on the ${input.teamName} squad for ${site.fullName}.`;
+
+  return {
+    subject: oneLine(`${input.newAlias} has joined your team, ${input.teamName} · ${site.fullName}`),
+    html: layout({
+      preheader: `${input.newAlias} has joined ${input.teamName}. ${space}`,
+      title: `New squadmate · ${site.fullName}`,
+      eyebrow: "NEW SQUADMATE",
+      headingHtml: `${esc(input.newAlias)} has joined<br>${esc(input.teamName)}`,
+      introHtml: esc(intro),
+      codeNote,
+      teamCode: input.teamCode,
+      rosterTitle: `${input.teamName.toUpperCase()} · SQUAD ROSTER`,
+      roster: input.roster,
+      rulesUrl: input.rulesUrl,
+      reason,
+    }),
+    text: plainText({
+      heading: `${input.newAlias} has joined ${input.teamName}`,
       intro,
       teamCode: input.teamCode,
       codeNote,

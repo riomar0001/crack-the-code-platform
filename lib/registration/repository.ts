@@ -186,3 +186,45 @@ export async function joinTeam(input: JoinInput): Promise<JoinResult> {
 
   return mapUniqueViolation(error, input.members);
 }
+
+export type TeamMemberContact = {
+  position: number;
+  alias: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+};
+
+type TeamMembersRecord = {
+  team_members: {
+    position: number;
+    alias: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+  }[];
+};
+
+/**
+ * Everyone on a team, captain first, by team code. Server-only: it carries
+ * email addresses, which are used to notify the squad and never sent to the
+ * browser.
+ */
+export async function listTeamMembers(teamCode: string): Promise<TeamMemberContact[]> {
+  const { data, error } = await getSupabaseAdmin()
+    .from("teams")
+    .select("team_members (position, alias, first_name, last_name, email)")
+    .eq("team_code", teamCode)
+    .order("position", { referencedTable: "team_members", ascending: true })
+    .overrideTypes<TeamMembersRecord[]>();
+
+  if (error) throw error;
+
+  return (data?.[0]?.team_members ?? []).map((member) => ({
+    position: member.position,
+    alias: member.alias,
+    firstName: member.first_name,
+    lastName: member.last_name,
+    email: member.email,
+  }));
+}

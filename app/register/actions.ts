@@ -2,7 +2,7 @@
 
 import { after } from "next/server";
 
-import { sendJoinEmail, sendRegistrationEmails } from "@/lib/email/notifications";
+import { sendJoinEmails, sendRegistrationEmails } from "@/lib/email/notifications";
 import { describeError } from "@/lib/errors";
 import { joinTeam as joinTeamRecord, saveRegistration } from "@/lib/registration/repository";
 import { joinSchema, registrationSchema } from "@/lib/registration/schema";
@@ -148,7 +148,7 @@ export async function joinTeam(_previous: JoinState, formData: FormData): Promis
     }
 
     after(() =>
-      sendJoinEmail({
+      sendJoinEmails({
         teamName: result.teamName,
         teamCode: parsed.data.teamCode,
         member: parsed.data.members[0],

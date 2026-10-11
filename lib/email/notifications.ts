@@ -2,10 +2,13 @@ import "server-only";
 
 import type { MemberInput } from "@/lib/registration/schema";
 
+import { listTeamMembers } from "@/lib/registration/repository";
+
 import { sendMail } from "./mailer";
 import {
   joinConfirmationEmail,
   registrationConfirmationEmail,
+  squadmateJoinedEmail,
   type RosterEntry,
 } from "./templates";
 
@@ -61,36 +64,77 @@ export async function sendRegistrationEmails(input: {
 }
 
 /**
- * Confirms to a teammate that they joined a squad. `roster` is the aliases
- * from the database, captain first; only the joiner's own real name is known
- * here, so that is the only one shown.
+ * Two emails when someone joins a squad by its code:
+ *   - the joiner is told they have successfully joined, and
+ *   - everyone already on the squad is told who joined, in one message, so a
+ *     captain notices if the code has been passed to someone unexpected.
+ *
+ * `roster` is the aliases from the database, captain first. The joiner sees
+ * only their own real name; teammates, who share the squad, see everyone's.
  */
-export async function sendJoinEmail(input: {
+export async function sendJoinEmails(input: {
   teamName: string;
   teamCode: string;
   member: MemberInput;
   roster: string[];
 }): Promise<void> {
-  const mine = input.roster.findIndex(
-    (alias) => alias.toLowerCase() === input.member.alias.toLowerCase(),
-  );
+  const joinerAlias = input.member.alias.toLowerCase();
+  const isJoiner = (alias: string) => alias.toLowerCase() === joinerAlias;
 
-  const roster: RosterEntry[] = input.roster.map((alias, index) => {
-    const parts = [
-      index === mine ? `${fullName(input.member)} · You` : null,
-      index === 0 && index !== mine ? "Captain" : null,
-    ].filter(Boolean);
+  const joinerRoster: RosterEntry[] = input.roster.map((alias, index) => {
+    const detail = [
+      isJoiner(alias) ? `${fullName(input.member)} · You` : null,
+      index === 0 && !isJoiner(alias) ? "Captain" : null,
+    ]
+      .filter(Boolean)
+      .join(" · ");
 
-    return { alias, detail: parts.join(" · ") || undefined };
+    return { alias, detail: detail || undefined };
   });
 
-  const email = joinConfirmationEmail({
+  const toJoiner = joinConfirmationEmail({
     alias: input.member.alias,
     teamName: input.teamName,
     teamCode: input.teamCode,
-    roster,
+    roster: joinerRoster,
     rulesUrl: rulesUrl(),
   });
 
-  await sendMail({ to: input.member.email, ...email });
+  const tasks: Promise<unknown>[] = [sendMail({ to: input.member.email, ...toJoiner })];
+
+  tasks.push(
+    (async () => {
+      const members = await listTeamMembers(input.teamCode);
+      const others = members.filter((member) => !isJoiner(member.alias));
+
+      if (others.length === 0) return;
+
+      const toSquad = squadmateJoinedEmail({
+        teamName: input.teamName,
+        teamCode: input.teamCode,
+        newAlias: input.member.alias,
+        newName: fullName(input.member),
+        rulesUrl: rulesUrl(),
+        roster: members.map((member) => ({
+          alias: member.alias,
+          detail: [
+            `${member.firstName} ${member.lastName}`,
+            member.position === 0 ? "Captain" : null,
+            isJoiner(member.alias) ? "New" : null,
+          ]
+            .filter(Boolean)
+            .join(" · "),
+        })),
+      });
+
+      await sendMail({ to: others.map((member) => member.email), ...toSquad });
+    })(),
+  );
+
+  // Independent: one failing (or a lookup error) must not stop the other.
+  const results = await Promise.allSettled(tasks);
+
+  for (const result of results) {
+    if (result.status === "rejected") console.error("[mail] join notification failed:", result.reason);
+  }
 }

@@ -73,8 +73,10 @@ offset). Defaults to `2026-10-30T09:00:00+08:00`.
 
 ### 4. Confirmation emails
 
-Registering a team emails every member, and joining a team emails the new
-member, over SMTP (`lib/email/`). Set these in `.env`:
+Registering a team sends one email to the whole squad. Joining a team sends
+two: the new member is told they have joined, and everyone already on the
+squad is told who joined (so a captain notices an unexpected joiner). All over
+SMTP (`lib/email/`). Set these in `.env`:
 
 ```
 SMTP_HOST="smtp.example.com"
