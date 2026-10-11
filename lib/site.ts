@@ -4,9 +4,9 @@
  */
 
 export const site = {
-  name: "Crack The Code",
-  suffix: "CTF Extended",
-  fullName: "Crack The Code CTF Extended",
+  name: "Crack The Code CTF",
+  suffix: "Extended 2026",
+  fullName: "Crack The Code CTF Extended 2026",
   shortMark: "CTC",
   season: "SEASON 03",
   format: "JEOPARDY-STYLE · TEAMS OF 1–4",

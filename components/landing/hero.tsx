@@ -28,8 +28,8 @@ export function Hero() {
           </Reveal>
 
           <Reveal as="h1" delay={100} className="ctc-hero-title">
-            <span>CRACK</span>
-            <span>THE CODE </span>
+            <span>CRACK THE</span>
+            <span>CODE CTF</span>
             <span className="ctc-hero-title-tag">
               {site.suffix.toUpperCase()}
             </span>
