@@ -61,16 +61,25 @@ type TeamRecord = {
 export async function listRegistrations(): Promise<RegistrationTeam[]> {
   const supabase = getSupabaseAdmin();
 
-  const { data, error } = await supabase
-    .from("teams")
-    .select(SELECT)
-    .order("created_at", { ascending: true })
-    .order("position", { referencedTable: "team_members", ascending: true })
-    .overrideTypes<TeamRecord[]>();
+  const records: TeamRecord[] = [];
+  // PostgREST caps responses. Page explicitly so the directory and exports
+  // never silently stop at the database's default row limit.
+  for (;;) {
+    const { data, error } = await supabase
+      .from("teams")
+      .select(SELECT)
+      .order("created_at", { ascending: true })
+      .order("id", { ascending: true })
+      .order("position", { referencedTable: "team_members", ascending: true })
+      .range(records.length, records.length + 499)
+      .overrideTypes<TeamRecord[]>();
 
-  if (error) throw error;
+    if (error) throw error;
+    if (!data?.length) break;
+    records.push(...data);
+  }
 
-  return (data ?? []).map((team) => ({
+  return records.map((team) => ({
     id: team.id,
     name: team.name,
     teamCode: team.team_code,

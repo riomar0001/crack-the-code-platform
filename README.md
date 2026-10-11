@@ -9,13 +9,14 @@ Computing Education CTF competition. Next.js 16 (App Router) + Supabase.
 | ----------- | ------------------------------------------------------------ |
 | `/`         | Hero, countdown, mission select, FAQ                          |
 | `/register` | Team registration, writes to Supabase                         |
+| `/admin`    | Token-protected registration directory, copy and CSV export    |
 | `/rules`    | Competition guidelines                                        |
 | `/conduct`  | Code of Conduct                                               |
 | `/terms`    | Terms of Service                                              |
 | `/privacy`  | Privacy Policy                                                |
 
-Every page is statically prerendered; registration is the only dynamic path
-and runs through a Server Action.
+Public pages are statically prerendered; registration uses a dynamic gate and
+Server Actions. The admin page loads registrations from authenticated APIs.
 
 ## Getting started
 
@@ -139,8 +140,9 @@ are misread when dictated at the venue — `l I 1 O o 0`. That gives ~46 bits
 of entropy; widen it by editing the three constants in
 `generate_ctfd_password()`.
 
-**These are not shown anywhere in the UI.** The confirmation screen only
-reveals the team code. Export them for distribution with:
+**These are not shown in the public registration UI.** The confirmation screen
+only reveals the team code. Authorised organisers can view and copy credentials
+at `/admin`, or export them for distribution with:
 
 ```sql
 select t.name                as team,
@@ -165,21 +167,65 @@ anon/publishable key cannot read or write them. All access goes through the
 Server Action using `SUPABASE_SECRET_KEY`. `lib/supabase/admin.ts` imports
 `server-only`, which turns an accidental client import into a build error.
 
+## Admin sign-in
+
+Admins sign in with an **email and password**. Accounts are Supabase Auth
+users, so passwords are hashed and rate-limited by Supabase and you can add or
+remove admins without redeploying.
+
+1. In the Supabase dashboard open **Authentication → Users → Add user → Create
+   new user**, enter the admin's email and a strong password, and tick
+   **Auto Confirm User**.
+2. Under **Authentication → Sign In / Providers**, turn **off** "Allow new
+   users to sign up" — nobody should be able to create their own account.
+3. List who may use the admin area in `.env`:
+
+   ```ini
+   ADMIN_EMAILS="you@example.com, another@example.com"
+   ```
+
+Being a Supabase user is not enough: the email must also be in `ADMIN_EMAILS`
+and confirmed. With `ADMIN_EMAILS` unset the admin area is **off** (503), never
+open. A wrong password, an unknown email and a non-admin email all get the same
+"Invalid email or password" answer.
+
+The session is an HttpOnly cookie (about an hour, Supabase's default token
+lifetime; lengthen it under **Authentication → JWT expiry** if you like). It is
+`Secure` in production, `SameSite=Lax`, and requests that change something are
+also checked against the site's `Origin`. Serve the deployed app over HTTPS.
+`ADMIN_API_TOKEN` is no longer used.
+
+## Admin dashboard
+
+Open `/admin` and sign in. The dashboard calls the admin APIs with your
+session cookie; nothing secret is kept in page memory or local storage.
+
+- Search by team, code, participant name, alias, email, student ID or CTFd username.
+- Filter by CTFd sync status and view each team's roster.
+- Copy team codes, email addresses, and team or individual CTFd credentials.
+- Copy CSV or download CSV for **all matching teams**, across every result page.
+  Passwords are excluded by default; enable **Include passwords in CSV** when needed.
+- Use **Refresh** to load new registrations. Passwords in team details are masked
+  until **Show passwords** is selected; credential copy buttons copy the actual passwords.
+
+The dashboard reviews and exports registrations; it does not edit or delete
+registrations or trigger CTFd sync.
+
 ## Admin API
 
 Registration itself is a Server Action, not REST — the browser form is its
 only caller. These endpoints exist for the things that genuinely need HTTP:
 exporting credentials and talking to CTFd.
 
-All of them require a bearer token:
+All of them need an admin session: the browser's cookie after signing in, or,
+for scripts, the access token from the login endpoint sent as a bearer token.
 
-```ini
-ADMIN_API_TOKEN="..."   # openssl rand -hex 32
+```bash
+# Sign in; prints the access token (it also sets the cookie in a browser)
+ACCESS_TOKEN=$(curl -s -X POST -H "Content-Type: application/json" \
+  -d '{"email":"you@example.com","password":"..."}' \
+  localhost:3000/api/admin/login | python -c "import sys,json; print(json.load(sys.stdin)['accessToken'])")
 ```
-
-No token configured means the API is **off** (503), never open. Tokens shorter
-than 24 characters are rejected, and comparison is constant-time over SHA-256
-digests so neither length nor a matching prefix leaks through timing.
 
 | Method | Route | Purpose |
 | --- | --- | --- |
@@ -188,10 +234,8 @@ digests so neither length nor a matching prefix leaks through timing.
 | `POST` | `/api/admin/ctfd/sync` | Push teams and users into CTFd |
 
 ```bash
-TOKEN=$(grep '^ADMIN_API_TOKEN=' .env | cut -d'"' -f2)
-
-curl -H "Authorization: Bearer $TOKEN" localhost:3000/api/admin/teams
-curl -H "Authorization: Bearer $TOKEN" -o credentials.csv localhost:3000/api/admin/export
+curl -H "Authorization: Bearer $ACCESS_TOKEN" localhost:3000/api/admin/teams
+curl -H "Authorization: Bearer $ACCESS_TOKEN" -o credentials.csv localhost:3000/api/admin/export
 ```
 
 The CSV escapes cells beginning `= + - @` with a leading apostrophe. Team
@@ -207,11 +251,11 @@ CTFD_ADMIN_TOKEN="ctfd_..."     # CTFd → Settings → Access Tokens
 
 ```bash
 # Preview — writes nothing (this is the default)
-curl -X POST -H "Authorization: Bearer $TOKEN" \
+curl -X POST -H "Authorization: Bearer $ACCESS_TOKEN" \
   "localhost:3000/api/admin/ctfd/sync?dryRun=true"
 
 # Actually push
-curl -X POST -H "Authorization: Bearer $TOKEN" \
+curl -X POST -H "Authorization: Bearer $ACCESS_TOKEN" \
   "localhost:3000/api/admin/ctfd/sync?dryRun=false"
 ```
 
@@ -238,12 +282,14 @@ app/
   styles/          Modular CSS partials, imported by globals.css
                    (responsive.css loads last and holds every breakpoint)
   register/        Registration page + its Server Action
+  admin/           Registration dashboard
   api/admin/       Authenticated REST: teams, export, ctfd/sync
   rules|conduct|terms|privacy/
 components/
   layout/          Header, footer, wordmark, intro curtain
   landing/         Hero, countdown, terminal, mission select, FAQ
   register/        Form, join form, rules modal, member row, squad card
+  admin/           Authenticated registration directory and copy/export UI
   docs/            Legal document renderer
   decor/           Purely ornamental layers (sky, ticker, backdrops)
   ui/              Reveal, Halo, HexBadge

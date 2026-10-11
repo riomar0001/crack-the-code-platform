@@ -10,7 +10,7 @@ import { syncToCtfd } from "@/lib/ctfd/sync";
  * carrying a CTFd id are skipped.
  *
  * Preview without writing anything:
- *   curl -X POST -H "Authorization: Bearer $ADMIN_API_TOKEN" \
+ *   curl -X POST -H "Authorization: Bearer $ACCESS_TOKEN" \
  *        "localhost:3000/api/admin/ctfd/sync?dryRun=true"
  *
  * Requires CTFD_URL and CTFD_ADMIN_TOKEN.
@@ -20,7 +20,7 @@ import { syncToCtfd } from "@/lib/ctfd/sync";
 export const maxDuration = 300;
 
 export async function POST(request: Request) {
-  const auth = authorizeAdmin(request);
+  const auth = await authorizeAdmin(request);
   if (!auth.ok) return adminAuthResponse(auth);
 
   const config = getCtfdConfig();

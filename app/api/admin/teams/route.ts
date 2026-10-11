@@ -8,10 +8,10 @@ import { listRegistrations } from "@/lib/admin/registrations";
  * Every registration as JSON, including CTFd credentials.
  * Pass `?credentials=false` to omit the passwords.
  *
- *   curl -H "Authorization: Bearer $ADMIN_API_TOKEN" localhost:3000/api/admin/teams
+ *   curl -H "Authorization: Bearer $ACCESS_TOKEN" localhost:3000/api/admin/teams
  */
 export async function GET(request: Request) {
-  const auth = authorizeAdmin(request);
+  const auth = await authorizeAdmin(request);
   if (!auth.ok) return adminAuthResponse(auth);
 
   const includeCredentials =
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     }));
 
     return Response.json(
-      { teams: payload, count: payload.length },
+      { teams: payload, count: payload.length, admin: auth.admin.email },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch (error) {
