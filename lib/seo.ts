@@ -28,6 +28,10 @@ export const absoluteUrl = (path: string) => `${getSiteUrl()}${path === "/" ? ""
  */
 export const seoDescription = `${site.fullName} is a capture-the-flag competition for College of Computing Education students at the University of Mindanao, held October 30, 2026.`;
 
+/** Who may take part, in the words used for search-engine data. */
+const AUDIENCE = "University of Mindanao students of the College of Computing Education";
+const ELIGIBILITY = `Open only to ${AUDIENCE}.`;
+
 export const defaultTitle = `${site.fullName} · CTF Competition`;
 
 /**
@@ -102,13 +106,18 @@ export function pageMetadata({ title, description, path }: PageMetadataInput): M
 
 /**
  * schema.org Event + WebSite, for rich results. Dates come from site.ts so
- * they cannot drift from the countdown.
+ * they cannot drift from the countdown. `registrationOpen` is passed in (and
+ * the caller reads the clock per request) so availability flips to sold out
+ * after the deadline without a redeploy.
  */
-export function homeJsonLd() {
+export function homeJsonLd({ registrationOpen }: { registrationOpen: boolean }) {
   const url = getSiteUrl();
+  // Google wants a URL for every organizer. One without a site of its own
+  // (a student team) points at this site, which it runs.
   const organizers = credits[0].entries.map((entry) => ({
     "@type": "Organization",
     name: entry.name,
+    url: entry.url ?? url,
   }));
 
   return {
@@ -126,10 +135,11 @@ export function homeJsonLd() {
         "@type": "Event",
         "@id": `${url}/#event`,
         name: site.fullName,
-        description: site.tagline,
+        description: `${site.tagline} ${ELIGIBILITY}`,
         url,
         image: [socialImage().url],
         startDate: site.eventStart,
+        endDate: site.eventEnd,
         eventStatus: "https://schema.org/EventScheduled",
         eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
         inLanguage: "en",
@@ -144,6 +154,19 @@ export function homeJsonLd() {
           },
         },
         organizer: organizers,
+        isAccessibleForFree: true,
+        audience: { "@type": "Audience", audienceType: AUDIENCE },
+        // Entry is free; the offer is the registration, open until it closes.
+        offers: {
+          "@type": "Offer",
+          url: absoluteUrl("/register"),
+          price: "0",
+          priceCurrency: "PHP",
+          availability: registrationOpen
+            ? "https://schema.org/InStock"
+            : "https://schema.org/SoldOut",
+          validThrough: site.registrationCloses,
+        },
       },
     ],
   };

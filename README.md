@@ -73,6 +73,9 @@ successful run means credentials work.
 offset). Defaults to `2026-10-30T09:00:00+08:00`. The countdown disappears once
 that moment passes.
 
+`NEXT_PUBLIC_EVENT_END` sets when the event ends (ISO 8601 with offset; defaults
+to `2026-10-30T17:00:00+08:00`). It only feeds the search-engine event data.
+
 `NEXT_PUBLIC_REGISTRATION_CLOSES` overrides when registration closes. Defaults
 to `2026-10-29T23:59:59+08:00` (the end of October 29). After it, the server
 actions refuse new teams and joins, `/register` shows a "closed" notice, and the

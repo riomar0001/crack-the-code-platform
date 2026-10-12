@@ -24,6 +24,12 @@ export const site = {
   eventStart: process.env.NEXT_PUBLIC_EVENT_START ?? "2026-10-30T09:00:00+08:00",
 
   /**
+   * When the event ends, same format. Search engines want an end date for
+   * events. Override per-deployment with NEXT_PUBLIC_EVENT_END.
+   */
+  eventEnd: process.env.NEXT_PUBLIC_EVENT_END ?? "2026-10-30T17:00:00+08:00",
+
+  /**
    * The moment registration closes, ISO 8601 with offset. The default is the end
    * of October 29, the day before the event. Override per-deployment with
    * NEXT_PUBLIC_REGISTRATION_CLOSES. A value that does not parse as a date is
@@ -60,6 +66,8 @@ export type Credit = {
   name: string;
   /** Path under /public. Omit for a text-only credit. */
   logo?: string;
+  /** The organization's own website, for search-engine structured data. */
+  url?: string;
 };
 
 export type CreditGroup = {
@@ -78,6 +86,7 @@ export const credits: readonly CreditGroup[] = [
       {
         name: "University of Mindanao College of Computing Education",
         logo: "/credits/um-cce.webp",
+        url: "https://umindanao.edu.ph",
       },
       { name: "UM CCE Olympus Protocol" },
     ],

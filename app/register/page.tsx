@@ -13,7 +13,7 @@ import { site } from "@/lib/site";
 
 export const metadata: Metadata = pageMetadata({
   title: "Team Registration",
-  description: `Register your squad of ${site.minMembers}–${site.maxMembers} for ${site.fullName}. Open to all College of Computing Education students.`,
+  description: `Register your squad of ${site.minMembers}–${site.maxMembers} for ${site.fullName}. Open only to University of Mindanao students from the College of Computing Education.`,
   path: "/register",
 });
 
