@@ -1,0 +1,426 @@
+diff --git a/assets/view.html b/assets/view.html
+index 3425d16..1ea5281 100755
+--- a/assets/view.html
++++ b/assets/view.html
+@@ -15,6 +15,10 @@
+ 
+ 		<div id="container-request-result" style="display: none;">
+ 			<p><code id="container-connection-info"></code></p>
++			<button type="button" class="btn btn-warning card-link" id="container-reset-btn"
++				onclick="container_reset({{ challenge.id }})">
++				Reset instance
++			</button>
+ 
+ 			<!-- Button to destroy the container instance -->
+ 			<button type="button" class="btn btn-danger card-link" id="container-stop-btn"
+diff --git a/assets/view.js b/assets/view.js
+index f516510..d80585c 100755
+--- a/assets/view.js
++++ b/assets/view.js
+@@ -76,12 +76,79 @@ function container_running(challenge_id) {
+ 		} else {
+ 			// Other cases, if needed
+ 		}
+-		console.log(data);
++
+ 	};
+ }
+ 
+ // Function to request a new container instance
++var containerReadyTimer = null;
++var containerReadyGeneration = {};
++function stop_readiness_poll() {
++	containerReadyGeneration = {};
++	clearTimeout(containerReadyTimer);
++	containerReadyTimer = null;
++}
++
++function poll_readiness(challenge_id) {
++	var generation = containerReadyGeneration;
++	if (!document.getElementById("container-connection-info") ||
++		parseInt(CTFd.lib.$("#challenge-id").val()) !== challenge_id) return;
++	var xhr = new XMLHttpRequest();
++	xhr.open("POST", "/containers/api/running", true);
++	xhr.setRequestHeader("Content-Type", "application/json");
++	xhr.setRequestHeader("CSRF-Token", init.csrfNonce);
++	xhr.timeout = 10000;
++	xhr.onload = function () {
++		if (generation !== containerReadyGeneration) return;
++		if (!document.getElementById("container-connection-info") ||
++			parseInt(CTFd.lib.$("#challenge-id").val()) !== challenge_id) return;
++		if (xhr.status !== 200) {
++			document.getElementById("container-connection-info").textContent = "Could not check Windows readiness. Reopen the challenge to try again.";
++			return;
++		}
++		var data = JSON.parse(xhr.responseText);
++		if (data.status !== "already_running") {
++			document.getElementById("container-connection-info").textContent = "Instance stopped or expired. Reopen this challenge to start another.";
++			return;
++		}
++		display_connection(data, challenge_id);
++	};
++	xhr.onerror = xhr.ontimeout = function () {
++		if (generation !== containerReadyGeneration) return;
++		if (document.getElementById("container-connection-info")) {
++			containerReadyTimer = setTimeout(function () { poll_readiness(challenge_id); }, 5000);
++		}
++	};
++	xhr.send(JSON.stringify({ chal_id: challenge_id }));
++}
++
++function display_connection(data, challenge_id) {
++	stop_readiness_poll();
++	var connectionInfo = document.getElementById("container-connection-info");
++	connectionInfo.replaceChildren();
++	if (data.protocol === "rdp" && !data.ready) {
++		connectionInfo.textContent = data.notice;
++		containerReadyTimer = setTimeout(function () { poll_readiness(challenge_id); }, 5000);
++		return;
++	}
++	var address = data.hostname + ":" + data.port;
++	if (data.protocol === "rdp") {
++		connectionInfo.textContent = "RDP: " + address + "\nUsername: " + data.username + "\nPassword: " + data.password + "\n" + data.notice;
++		connectionInfo.style.whiteSpace = "pre-wrap";
++	} else if (/^https?:\/\//.test(data.hostname)) {
++		var link = document.createElement("a");
++		link.href = address;
++		link.target = "_blank";
++		link.rel = "noopener";
++		link.textContent = address;
++		connectionInfo.appendChild(link);
++	} else {
++		connectionInfo.textContent = address;
++	}
++}
++
+ function container_request(challenge_id) {
++	stop_readiness_poll();
+ 	var path = "/containers/api/request";
+ 	var requestButton = document.getElementById("container-request-btn");
+ 	var requestResult = document.getElementById("container-request-result");
+@@ -116,21 +183,19 @@ function container_request(challenge_id) {
+ 			requestError.style.display = "none";
+ 			requestError.firstElementChild.innerHTML = "";
+ 			requestButton.parentNode.removeChild(requestButton);
+-			if (data.hostname.startsWith("http")) {
+-				connectionInfo.innerHTML = '<a href="' + data.hostname + ':' + data.port + '" target="_blank">' + data.hostname + ':' + data.port + '</a>';
+-			} else {
+-				connectionInfo.innerHTML = data.hostname + ' ' + data.port;
+-			}
++			display_connection(data, challenge_id);
+ 			containerExpires.innerHTML = Math.ceil((new Date(data.expires * 1000) - new Date()) / 1000 / 60);
+ 			containerExpiresTime.style.display = "";
+ 			requestResult.style.display = "";
+ 		}
+-		console.log(data);
++
+ 	};
+ }
+ 
+ // Function to reset the container
+ function container_reset(challenge_id) {
++	stop_readiness_poll();
++	document.getElementById("container-connection-info").textContent = "Resetting Windows instance...";
+ 	var path = "/containers/api/reset";
+ 	var resetButton = document.getElementById("container-reset-btn");
+ 	var requestResult = document.getElementById("container-request-result");
+@@ -161,12 +226,12 @@ function container_reset(challenge_id) {
+ 		} else {
+ 			// Success case
+ 			requestError.style.display = "none";
+-			connectionInfo.innerHTML = data.hostname + ":" + data.port;
+-			containerExpires.innerHTML = Math.ceil((new Date(data.expires * 1000) - new Date()) / 1000 / 60);
++			display_connection(data, challenge_id);
++			document.getElementById("container-expires").innerHTML = Math.ceil((new Date(data.expires * 1000) - new Date()) / 1000 / 60);
+ 			requestResult.style.display = "";
+ 			resetButton.removeAttribute("disabled");
+ 		}
+-		console.log(data);
++
+ 	};
+ }
+ 
+@@ -206,12 +271,13 @@ function container_renew(challenge_id) {
+ 			containerExpires.innerHTML = Math.ceil((new Date(data.expires * 1000) - new Date()) / 1000 / 60);
+ 			renewButton.removeAttribute("disabled");
+ 		}
+-		console.log(data);
++
+ 	};
+ }
+ 
+ // Function to stop the container instance
+ function container_stop(challenge_id) {
++	stop_readiness_poll();
+ 	var path = "/containers/api/stop";
+ 	var stopButton = document.getElementById("container-stop-btn");
+ 	var requestResult = document.getElementById("container-request-result");
+@@ -246,6 +312,6 @@ function container_stop(challenge_id) {
+ 			requestResult.innerHTML = "Container stopped. <br>Reopen this challenge to start another.";
+ 			containerExpiresTime.style.display = "none"; // Hide expiration time
+ 		}
+-		console.log(data);
++
+ 	};
+ }
+diff --git a/container_manager.py b/container_manager.py
+index a555ecf..6c6367e 100755
+--- a/container_manager.py
++++ b/container_manager.py
+@@ -7,6 +7,7 @@ import atexit
+ import time
+ import json
+ import docker
++from .windows_instances import provision, cleanup, connection_details, TEMPLATE_LABEL, serialize_launch
+ import paramiko.ssh_exception
+ import requests
+ 
+@@ -187,6 +188,7 @@ class ContainerManager:
+         return container[0].status == "running"
+ 
+     @run_command
++    @serialize_launch
+     def create_container(self, image: str, port: int, command: str, volumes: str):
+         """
+         Create a new Docker container.
+@@ -232,17 +234,30 @@ class ContainerManager:
+             except json.decoder.JSONDecodeError:
+                 raise ContainerException("Volumes JSON string is invalid")
+ 
++        windows = None
+         try:
++            if self.client.images.get(image).labels.get(TEMPLATE_LABEL):
++                if int(port) != 3389 or volumes or command:
++                    raise ContainerException("Windows RDP challenges require port 3389 and empty command/volumes.")
++                windows = provision(self.client, image)
++                kwargs.update(windows)
+             return self.client.containers.run(
+                 image,
+                 ports={str(port): None},
+                 command=command,
+                 detach=True,
+-                auto_remove=True,
++                auto_remove=windows is None,
+                 **kwargs
+             )
+         except docker.errors.ImageNotFound:
+             raise ContainerException("Docker image not found")
++        except Exception:
++            if windows:
++                cleanup(self.client, windows["labels"])
++            raise
++
++    def connection_details(self, container_id):
++        return connection_details(self.client.containers.get(container_id))
+ 
+     @run_command
+     def get_container_port(self, container_id: str) -> "str|None":
+@@ -292,7 +307,14 @@ class ContainerManager:
+             container_id (str): The ID of the container to kill.
+         """
+         try:
+-            self.client.containers.get(container_id).kill()
++            container = self.client.containers.get(container_id)
++            labels = container.labels
++            if labels.get("io.ctfd.windows.instance") == "true":
++                container.stop(timeout=120)
++                container.remove()
++                cleanup(self.client, labels)
++            else:
++                container.kill()
+         except docker.errors.NotFound:
+             pass
+ 
+diff --git a/logs.py b/logs.py
+index def803c..75a4e58 100644
+--- a/logs.py
++++ b/logs.py
+@@ -24,7 +24,7 @@ class CustomFormatter(logging.Formatter):
+         Returns:
+             str: The formatted log record.
+         """
+-        user = get_current_user()  # Get the current user object.
++        user = get_current_user() if has_request_context() else None
+         if has_request_context():
+             ip = request.remote_addr  # Get the remote IP address of the request.
+             if ip is not None and ip != "" and ip != "None":
+diff --git a/routes.py b/routes.py
+index 34c0d97..9e5f8a5 100644
+--- a/routes.py
++++ b/routes.py
+@@ -119,7 +119,10 @@ def route_running_container():
+             log("containers_actions", format="CHALL_ID:{challenge_id}|Container '{container_id}' already running",
+                 challenge_id=challenge.id,
+                 container_id=running_container.container_id)
+-            return {"status": "already_running", "container_id": request.json.get("chal_id")}, 200
++            return {"status": "already_running", "container_id": request.json.get("chal_id"),
++                    "hostname": challenge.connection_info, "port": running_container.port,
++                    "expires": running_container.expires,
++                    **current_app.container_manager.connection_details(running_container.container_id)}, 200
+         else:
+             log("containers_actions", format="CHALL_ID:{challenge_id}|No running container found",
+                 challenge_id=challenge.id)
+diff --git a/routes_helper.py b/routes_helper.py
+index 748a9df..436c798 100644
+--- a/routes_helper.py
++++ b/routes_helper.py
+@@ -241,12 +241,14 @@ def create_container(container_manager, challenge_id, user_id, team_id, docker_a
+                     "status": "already_running",
+                     "hostname": challenge.connection_info,
+                     "port": running_container.port,
+-                    "expires": running_container.expires
++                    "expires": running_container.expires,
++                    **container_manager.connection_details(running_container.container_id)
+                 })
+             else:
+                 # If the container is not running, remove it from the database and proceed with creation
+                 log("containers_debug", format="CHALL_ID:{challenge_id}|Container '{container_id}' not running, removing from database",
+                         challenge_id=challenge_id, container_id=running_container.container_id)
++                container_manager.kill_container(running_container.container_id)
+                 db.session.delete(running_container)
+                 db.session.commit()
+         except Exception as err:
+@@ -293,6 +295,7 @@ def create_container(container_manager, challenge_id, user_id, team_id, docker_a
+ 
+     # If the port cannot be obtained, log the error and return an error response
+     if port is None:
++        container_manager.kill_container(created_container.id)
+         log("containers_errors", format="CHALL_ID:{challenge_id}|Could not get port for container '{container_id}'",
+                 challenge_id=challenge_id,
+                 container_id=created_container.id)
+@@ -320,6 +323,8 @@ def create_container(container_manager, challenge_id, user_id, team_id, docker_a
+                 challenge_id=challenge_id,
+                 container_id=created_container.id)
+     except Exception as db_err:
++        db.session.rollback()
++        container_manager.kill_container(created_container.id)
+         # Handle any database errors during the insertion of the new container record
+         log("containers_errors", format="CHALL_ID:{challenge_id}|Failed to add container '{container_id}' to database: {error}",
+                 challenge_id=challenge_id,
+@@ -334,5 +339,6 @@ def create_container(container_manager, challenge_id, user_id, team_id, docker_a
+         "status": "created",
+         "hostname": challenge.connection_info,
+         "port": port,
+-        "expires": expires
++        "expires": expires,
++        **container_manager.connection_details(created_container.id)
+     })
+diff --git a/windows_instances.py b/windows_instances.py
+new file mode 100644
+--- /dev/null
++++ b/windows_instances.py
+@@ -0,0 +1,114 @@
++"""Windows RDP instances cloned from an immutable, installed Dockur template."""
++
++import json
++import uuid
++import threading
++from functools import wraps
++
++import docker
++
++TEMPLATE_LABEL = "io.ctfd.windows.template"
++INSTANCE_LABEL = "io.ctfd.windows.instance"
++VOLUME_LABEL = "io.ctfd.windows.storage"
++NETWORK_LABEL = "io.ctfd.windows.network"
++_launch_lock = threading.Lock()
++
++
++def serialize_launch(function):
++    @wraps(function)
++    def wrapped(*args, **kwargs):
++        with _launch_lock:
++            return function(*args, **kwargs)
++    return wrapped
++
++
++def provision(client, image):
++    template = client.images.get(image).labels.get(TEMPLATE_LABEL)
++    if not template:
++        return None
++    # These are operator-created image labels, never participant input.
++    client.volumes.get(template)
++    running = client.containers.list(filters={"label": INSTANCE_LABEL})
++    if len(running) >= 2:
++        raise RuntimeError("Both Windows slots are in use. Try again after an instance stops.")
++    token = uuid.uuid4().hex
++    volume = client.volumes.create(name="ctfd-win-" + token,
++                                   labels={INSTANCE_LABEL: "true"})
++    network = None
++    try:
++        network = client.networks.create("ctfd-win-" + token, driver="bridge",
++                                         options={"com.docker.network.bridge.enable_icc": "false"},
++                                         labels={INSTANCE_LABEL: "true"})
++        script = '''set -e
++test -f /template/READY
++for f in windows.base windows.ver windows.boot windows.rom windows.vars; do
++    if [ -f /template/$f ]; then cp /template/$f /storage/$f; fi
++done
++qemu-img create -q -f qcow2 -F qcow2 -b /template/data.qcow2 /storage/data.qcow2
++cat /template/credentials.json
++'''
++        output = client.containers.run(image, entrypoint="/bin/bash", command=["-c", script],
++            volumes={template: {"bind": "/template", "mode": "ro"},
++                     volume.name: {"bind": "/storage", "mode": "rw"}}, remove=True,
++            network_disabled=True)
++        credentials = json.loads(output)
++        return dict(volumes={template: {"bind": "/template", "mode": "ro"},
++                             volume.name: {"bind": "/storage", "mode": "rw"}},
++                    devices=["/dev/kvm:/dev/kvm:rwm", "/dev/net/tun:/dev/net/tun:rwm"],
++                    cap_add=["NET_ADMIN"], network=network.name,
++                    environment={"DISK_FMT": "qcow2", "RAM_SIZE": "4G", "CPU_CORES": "2",
++                                 "USERNAME": credentials["username"], "PASSWORD": credentials["password"]},
++                    mem_limit="6g", cpu_period=100000, cpu_quota=200000,
++                    labels={INSTANCE_LABEL: "true", VOLUME_LABEL: volume.name,
++                            NETWORK_LABEL: network.name})
++    except Exception:
++        if network:
++            network.remove()
++        volume.remove()
++        raise
++
++
++def cleanup(client, labels):
++    if labels.get(INSTANCE_LABEL) != "true":
++        return
++    for collection, key in ((client.networks, NETWORK_LABEL), (client.volumes, VOLUME_LABEL)):
++        name = labels.get(key, "")
++        if not name.startswith("ctfd-win-"):
++            continue
++        try:
++            collection.get(name).remove()
++        except docker.errors.NotFound:
++            pass
++
++
++def connection_details(container):
++    if container.labels.get(INSTANCE_LABEL) != "true":
++        return {}
++    probe = '''import socket,sys,pathlib,ipaddress
++try:
++    leases=pathlib.Path("/var/lib/misc/dnsmasq.leases").read_text().splitlines()
++    addresses=[line.split()[2] for line in leases if len(line.split())>=3]
++    if not addresses: sys.exit(1)
++    address=str(ipaddress.IPv4Address(addresses[0]))
++    with socket.create_connection((address,3389),timeout=1.5) as s:
++        s.settimeout(1.5)
++        s.sendall(bytes.fromhex("030000130ee000000000000100080003000000"))
++        reply=b""
++        while len(reply)<19:
++            chunk=s.recv(19-len(reply))
++            if not chunk: break
++            reply+=chunk
++        sys.exit(0 if len(reply)>=19 and reply[5]==0xd0 and reply[11]==2 else 1)
++except OSError:
++    sys.exit(1)
++'''
++    try:
++        ready = container.exec_run(["python3", "-c", probe]).exit_code == 0
++    except docker.errors.APIError:
++        ready = False
++    if not ready:
++        return {"protocol": "rdp", "ready": False, "hostname": None, "port": None,
++                "notice": "Windows is booting. Connection details will appear when RDP is ready."}
++    env = dict(item.split("=", 1) for item in container.attrs["Config"]["Env"] if "=" in item)
++    return {"protocol": "rdp", "ready": True, "username": env["USERNAME"], "password": env["PASSWORD"],
++            "notice": "Windows is ready for Remote Desktop."}

@@ -1,0 +1,28 @@
+name: ctf-windows-test
+
+services:
+  windows:
+    image: dockurr/windows
+    environment:
+      VERSION: "11"
+      RAM_SIZE: "4G"
+      CPU_CORES: "2"
+      DISK_SIZE: "64G"
+      USERNAME: "CTFPlayer"
+      PASSWORD: "${WINDOWS_TEST_PASSWORD:?Set WINDOWS_TEST_PASSWORD in .env}"
+      COMMAND: 'cmd /c "mkdir C:\CTF & echo flag{windows_docker_test}>C:\CTF\flag.txt"'
+    devices:
+      - /dev/kvm
+      - /dev/net/tun
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "127.0.0.1:8006:8006"
+      - "127.0.0.1:13389:3389/tcp"
+      - "127.0.0.1:13389:3389/udp"
+    volumes:
+      - ./storage:/storage
+    mem_limit: 6g
+    cpus: 2
+    restart: "no"
+    stop_grace_period: 2m

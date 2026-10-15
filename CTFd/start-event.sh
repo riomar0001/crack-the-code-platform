@@ -16,11 +16,12 @@ cd "$(dirname "$0")"
 ENV_FILE=".event.env"
 ACTION="${1:-start}"
 WORKERS="${WORKERS:-4}"
+COMPOSE_FILES=(-f docker-compose.yml -f docker-compose.event.yml)
 
 step() { printf '\033[36m==> %s\033[0m\n' "$*"; }
 
 compose() {
-    docker compose --env-file "$ENV_FILE" -f docker-compose.yml -f docker-compose.event.yml "$@"
+    docker compose --env-file "$ENV_FILE" "${COMPOSE_FILES[@]}" "$@"
 }
 
 lan_ips() {
@@ -38,6 +39,13 @@ show_urls() {
 command -v docker >/dev/null || { echo "docker not found. Install Docker Engine first." >&2; exit 1; }
 docker info >/dev/null 2>&1 || { echo "Cannot talk to Docker. Is it running, and is your user in the 'docker' group (or use sudo)?" >&2; exit 1; }
 docker compose version >/dev/null 2>&1 || { echo "The 'docker compose' plugin is missing." >&2; exit 1; }
+
+if [ -f docker-compose.instances.yml ]; then
+    DOCKER_SOCKET_GID="$(docker run --rm -v /var/run/docker.sock:/var/run/docker.sock alpine:3.23 stat -c '%g' /var/run/docker.sock)"
+    [[ "$DOCKER_SOCKET_GID" =~ ^[0-9]+$ ]] || { echo "Could not determine the Docker socket group." >&2; exit 1; }
+    export DOCKER_SOCKET_GID
+    COMPOSE_FILES+=(-f docker-compose.instances.yml)
+fi
 
 # Secret key: generate once, reuse afterwards (changing it logs everyone out)
 if [ ! -f "$ENV_FILE" ]; then

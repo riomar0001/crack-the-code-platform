@@ -50,6 +50,15 @@ if ($LASTEXITCODE -ne 0) {
     throw "Docker is not running. Start Docker Desktop and try again."
 }
 
+if (Test-Path (Join-Path $PSScriptRoot "docker-compose.instances.yml")) {
+    $socketGroup = docker run --rm -v /var/run/docker.sock:/var/run/docker.sock alpine:3.23 stat -c '%g' /var/run/docker.sock
+    if ($LASTEXITCODE -ne 0 -or "$socketGroup".Trim() -notmatch '^\d+$') {
+        throw "Could not determine the Docker socket group for challenge instances."
+    }
+    $env:DOCKER_SOCKET_GID = "$socketGroup".Trim()
+    $Compose += @("-f", "docker-compose.instances.yml")
+}
+
 # --- Secret key: generate once, reuse afterwards (changing it logs everyone out) ---
 if (-not (Test-Path $EnvFile)) {
     Write-Step "Generating SECRET_KEY in .event.env"

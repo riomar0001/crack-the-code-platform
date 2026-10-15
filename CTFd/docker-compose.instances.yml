@@ -1,0 +1,8 @@
+services:
+  ctfd:
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    group_add:
+      - "${DOCKER_SOCKET_GID:?Set DOCKER_SOCKET_GID first}"
+    environment:
+      - WORKERS=1
